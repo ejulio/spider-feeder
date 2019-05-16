@@ -1,0 +1,72 @@
+from io import BytesIO
+from unittest.mock import Mock
+
+import pytest
+from scrapy import Spider, signals
+from scrapy.crawler import Crawler
+from scrapy.exceptions import NotConfigured
+
+from spider_feeder.loaders import StartUrlsLoader
+
+
+custom_reader = Mock(side_effect=lambda x: BytesIO(b'http://override.com'))
+
+
+@pytest.fixture
+def get_crawler():
+    def _crawler(extended_settings={}):
+        settings = {
+            "EXTENSIONS": {"spider_feeder.loaders.StartUrlsLoader": 500},
+        }
+        settings.update(extended_settings)
+        crawler = Crawler(Spider, settings=settings)
+        crawler.spider = Spider("dummy")
+        return crawler
+
+    return _crawler
+
+
+def test_start_urls_loader_not_configured(get_crawler):
+    crawler = get_crawler()
+    with pytest.raises(NotConfigured):
+        StartUrlsLoader.from_crawler(crawler)
+
+
+def test_start_urls_loader_should_register_signals(get_crawler, mocker):
+    mock = mocker.patch('spider_feeder.readers.open_local')
+    mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
+
+    crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 'file:///tmp/input_file.txt'})
+    loader = StartUrlsLoader.from_crawler(crawler)
+
+    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
+
+    assert crawler.spider.start_urls == ['https://url1.com', 'https://url2.com']
+    mock.assert_called_with('/tmp/input_file.txt')
+
+
+def test_start_urls_loader_should_open_file_given_scheme(get_crawler, mocker):
+    mock = mocker.patch('spider_feeder.readers.open_s3')
+    mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
+
+    crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 's3://input_file.txt'})
+    loader = StartUrlsLoader.from_crawler(crawler)
+
+    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
+
+    assert crawler.spider.start_urls == ['https://url1.com', 'https://url2.com']
+    mock.assert_called_with('input_file.txt')
+
+
+def test_should_override_reader(get_crawler, mocker):
+    crawler = get_crawler({
+        'SPIDERFEEDER_INPUT_FILE': 's3://input_file.txt',
+        'SPIDERFEEDER_READERS': {
+            's3': 'tests.test_start_urls_loader.custom_reader'
+        }
+    })
+    loader = StartUrlsLoader.from_crawler(crawler)
+
+    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
+
+    assert crawler.spider.start_urls == ['http://override.com']

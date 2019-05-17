@@ -7,9 +7,9 @@ from scrapy.utils.misc import load_object
 
 class StartUrlsLoader:
 
-    READERS = {
-        'file': 'spider_feeder.readers.open_local',
-        's3': 'spider_feeder.readers.open_s3',
+    FILE_HANDLERS = {
+        'file': 'spider_feeder.file_handler.local.open',
+        's3': 'spider_feeder.file_handler.s3.open',
     }
 
     @classmethod
@@ -18,17 +18,17 @@ class StartUrlsLoader:
         if not input_file_uri:
             raise NotConfigured('StartUrlsLoader requires SPIDERFEEDER_INPUT_FILE setting.')
 
-        readers = crawler.settings.getdict('SPIDERFEEDER_READERS', {})
-        readers = dict(cls.READERS, **readers)
-        extension = cls(input_file_uri, readers)
+        handlers = crawler.settings.getdict('SPIDERFEEDER_FILEHANDLERS', {})
+        handlers = dict(cls.FILE_HANDLERS, **handlers)
+        extension = cls(input_file_uri, handlers)
 
         crawler.signals.connect(extension.spider_openened, signal=signals.spider_opened)
 
         return extension
 
-    def __init__(self, input_file_uri, readers):
+    def __init__(self, input_file_uri, handlers):
         self._input_file_uri = input_file_uri
-        self._readers = readers
+        self._file_handlers = handlers
 
     def spider_openened(self, spider):
         with self._open_input_file() as f:
@@ -38,6 +38,6 @@ class StartUrlsLoader:
     def _open_input_file(self):
         parsed = urlparse(self._input_file_uri)
         file_path = f'{parsed.netloc}{parsed.path}'
-        reader = load_object(self._readers[parsed.scheme])
-        return reader(file_path)
+        open = load_object(self._file_handlers[parsed.scheme])
+        return open(file_path)
         

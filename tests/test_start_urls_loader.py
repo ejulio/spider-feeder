@@ -58,6 +58,18 @@ def test_start_urls_loader_should_open_file_given_scheme(get_crawler, mocker):
     mock.assert_called_with('input_file.txt')
 
 
+def test_no_scheme_should_load_local_file(get_crawler, mocker):
+    mock = mocker.patch('spider_feeder.file_handler.local.open')
+    mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
+
+    crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 'local.txt'})
+    loader = StartUrlsLoader.from_crawler(crawler)
+
+    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
+
+    mock.assert_called_with('local.txt')
+
+
 def test_should_override_reader(get_crawler, mocker):
     crawler = get_crawler({
         'SPIDERFEEDER_INPUT_FILE': 's3://input_file.txt',

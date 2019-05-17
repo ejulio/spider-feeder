@@ -8,6 +8,7 @@ from scrapy.utils.misc import load_object
 class StartUrlsLoader:
 
     FILE_HANDLERS = {
+        '': 'spider_feeder.file_handler.local.open',
         'file': 'spider_feeder.file_handler.local.open',
         's3': 'spider_feeder.file_handler.s3.open',
     }

@@ -38,7 +38,6 @@ class StartUrlsLoader:
 
     def _open_input_file(self):
         parsed = urlparse(self._input_file_uri)
-        file_path = f'{parsed.netloc}{parsed.path}'
         open = load_object(self._file_handlers[parsed.scheme])
-        return open(file_path)
+        return open(self._input_file_uri)
         

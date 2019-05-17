@@ -42,7 +42,7 @@ def test_start_urls_loader_should_register_signals(get_crawler, mocker):
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
     assert crawler.spider.start_urls == ['https://url1.com', 'https://url2.com']
-    mock.assert_called_with('/tmp/input_file.txt')
+    mock.assert_called_with('file:///tmp/input_file.txt')
 
 
 def test_start_urls_loader_should_open_file_given_scheme(get_crawler, mocker):
@@ -55,7 +55,7 @@ def test_start_urls_loader_should_open_file_given_scheme(get_crawler, mocker):
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
     assert crawler.spider.start_urls == ['https://url1.com', 'https://url2.com']
-    mock.assert_called_with('input_file.txt')
+    mock.assert_called_with('s3://input_file.txt')
 
 
 def test_no_scheme_should_load_local_file(get_crawler, mocker):

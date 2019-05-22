@@ -19,7 +19,7 @@ class StartUrlsLoader:
         if not input_file_uri:
             raise NotConfigured('StartUrlsLoader requires SPIDERFEEDER_INPUT_FILE setting.')
 
-        handlers = crawler.settings.getdict('SPIDERFEEDER_FILEHANDLERS', {})
+        handlers = crawler.settings.getdict('SPIDERFEEDER_FILE_HANDLERS', {})
         handlers = dict(cls.FILE_HANDLERS, **handlers)
         extension = cls(input_file_uri, handlers)
 

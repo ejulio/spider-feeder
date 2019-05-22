@@ -73,7 +73,7 @@ def test_no_scheme_should_load_local_file(get_crawler, mocker):
 def test_should_override_reader(get_crawler, mocker):
     crawler = get_crawler({
         'SPIDERFEEDER_INPUT_FILE': 's3://input_file.txt',
-        'SPIDERFEEDER_FILEHANDLERS': {
+        'SPIDERFEEDER_FILE_HANDLERS': {
             's3': 'tests.test_start_urls_loader.custom_reader'
         }
     })

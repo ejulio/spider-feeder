@@ -9,8 +9,8 @@ from botocore.response import StreamingBody
 from spider_feeder.file_handler import s3
 
 
-def get_object_response(content):
-    stream = BytesIO(content.encode('utf-8'))
+def get_object_response(content, encoding='utf-8'):
+    stream = BytesIO(content.encode(encoding))
     return {
         'Body': StreamingBody(stream, len(content)),
         'DeleteMarker': False,
@@ -64,13 +64,30 @@ def test_open_s3_blob(botocore_client, mocker):
     with stubber:
         file_content = 'http://url1.com\nhttps://url1.com'
         response = get_object_response(file_content)
-        expected_params = {'Bucket': 'bucket', 'Key': 'blob.txt'}
+        expected_params = {
+            'Bucket': 'bucket', 'Key': 'blob.txt', 'ResponseContentEncoding': 'utf-8'
+        }
         stubber.add_response('get_object', response, expected_params)
 
-        fd = s3.open('s3://bucket/blob.txt')
+        fd = s3.open('s3://bucket/blob.txt', encoding='utf-8')
 
         assert fd.read() == file_content
         assert isinstance(fd, StringIO)
+
+
+def test_open_encoded_s3_blob(botocore_client, mocker):
+    (stubber, _) = botocore_client(mocker)
+    with stubber:
+        file_content = 'http://url1.com\nhttps://url1.com\nhttp://vérystrangeurl.com'
+        response = get_object_response(file_content, encoding='iso-8859-1')
+        expected_params = {
+            'Bucket': 'bucket', 'Key': 'blob.txt', 'ResponseContentEncoding': 'iso-8859-1'
+        }
+        stubber.add_response('get_object', response, expected_params)
+
+        fd = s3.open('s3://bucket/blob.txt', encoding='iso-8859-1')
+
+        assert fd.read() == file_content
 
 
 def test_open_s3_blob_using_uri_credentials(botocore_client, mocker):
@@ -78,10 +95,12 @@ def test_open_s3_blob_using_uri_credentials(botocore_client, mocker):
     with stubber:
         file_content = 'http://url1.com\nhttps://url1.com'
         response = get_object_response(file_content)
-        expected_params = {'Bucket': 'bucket', 'Key': 'blob.txt'}
+        expected_params = {
+            'Bucket': 'bucket', 'Key': 'blob.txt', 'ResponseContentEncoding': 'utf-8'
+        }
         stubber.add_response('get_object', response, expected_params)
 
-        s3.open('s3://key_id:secret@bucket/blob.txt')
+        s3.open('s3://key_id:secret@bucket/blob.txt', encoding='utf-8')
 
         session_mock.create_client.assert_called_once_with(
             's3',
@@ -100,10 +119,12 @@ def test_open_s3_blob_using_project_credentials(botocore_client, mocker):
     with stubber:
         file_content = 'http://url1.com\nhttps://url1.com'
         response = get_object_response(file_content)
-        expected_params = {'Bucket': 'bucket', 'Key': 'blob.txt'}
+        expected_params = {
+            'Bucket': 'bucket', 'Key': 'blob.txt', 'ResponseContentEncoding': 'utf-8'
+        }
         stubber.add_response('get_object', response, expected_params)
 
-        s3.open('s3://bucket/blob.txt')
+        s3.open('s3://bucket/blob.txt', encoding='utf-8')
 
         session_mock.create_client.assert_called_once_with(
             's3',

@@ -8,7 +8,7 @@ from scrapy.utils.project import get_project_settings
 from botocore.session import get_session
 
 
-def open(blob_uri):
+def open(blob_uri, encoding):
     parsed = urlparse(blob_uri)
     settings = get_project_settings()
 
@@ -22,6 +22,6 @@ def open(blob_uri):
     bucket_name = parsed.hostname
     key_name = parsed.path[1:]
 
-    response = client.get_object(Bucket=bucket_name, Key=key_name)
+    response = client.get_object(Bucket=bucket_name, Key=key_name, ResponseContentEncoding=encoding)
     content = response['Body'].read()
-    return StringIO(content.decode('utf-8'))
+    return StringIO(content.decode(encoding))

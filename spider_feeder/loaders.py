@@ -32,12 +32,17 @@ class StartUrlsLoader:
         self._file_handlers = handlers
 
     def spider_openened(self, spider):
-        with self._open_input_file() as f:
+        input_file_uri = self._get_formatted_input_file_uri(spider)
+        with self._open(input_file_uri) as f:
             content = f.read().decode('utf-8')
             spider.start_urls = content.splitlines()
 
-    def _open_input_file(self):
-        parsed = urlparse(self._input_file_uri)
+    def _get_formatted_input_file_uri(self, spider):
+        params = {k: getattr(spider, k) for k in dir(spider)}
+        return self._input_file_uri % params
+
+    def _open(self, input_file_uri):
+        parsed = urlparse(input_file_uri)
         open = load_object(self._file_handlers[parsed.scheme])
-        return open(self._input_file_uri)
+        return open(input_file_uri)
         

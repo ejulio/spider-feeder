@@ -82,3 +82,17 @@ def test_should_override_reader(get_crawler, mocker):
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
     assert crawler.spider.start_urls == ['http://override.com']
+
+
+def test_uri_format_spider_attributes(get_crawler, mocker):
+    mock = mocker.patch('spider_feeder.file_handler.local.open')
+    mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
+
+    crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': '%(dir)s/%(input_file)s.txt'})
+    crawler.spider.dir = '/tmp'
+    crawler.spider.input_file = 'spider_input'
+    loader = StartUrlsLoader.from_crawler(crawler)
+
+    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
+
+    mock.assert_called_with('/tmp/spider_input.txt')

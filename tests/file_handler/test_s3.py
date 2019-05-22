@@ -1,5 +1,5 @@
 from datetime import datetime
-from io import BytesIO
+from io import StringIO, BytesIO
 
 import pytest
 import botocore.session
@@ -69,7 +69,8 @@ def test_open_s3_blob(botocore_client, mocker):
 
         fd = s3.open('s3://bucket/blob.txt')
 
-        assert fd.read().decode('utf-8') == file_content
+        assert fd.read() == file_content
+        assert isinstance(fd, StringIO)
 
 
 def test_open_s3_blob_using_uri_credentials(botocore_client, mocker):

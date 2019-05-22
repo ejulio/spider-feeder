@@ -1,6 +1,7 @@
 '''
 This module handles `open()` for files stored in AWS S3.
 '''
+from io import StringIO
 from urllib.parse import urlparse
 
 from scrapy.utils.project import get_project_settings
@@ -22,4 +23,5 @@ def open(blob_uri):
     key_name = parsed.path[1:]
 
     response = client.get_object(Bucket=bucket_name, Key=key_name)
-    return response['Body']
+    content = response['Body'].read()
+    return StringIO(content.decode('utf-8'))

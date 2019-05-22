@@ -1,4 +1,4 @@
-from io import BytesIO
+from io import StringIO
 from unittest.mock import Mock
 
 import pytest
@@ -9,7 +9,7 @@ from scrapy.exceptions import NotConfigured
 from spider_feeder.loaders import StartUrlsLoader
 
 
-custom_reader = Mock(side_effect=lambda x: BytesIO(b'http://override.com'))
+custom_reader = Mock(side_effect=lambda x: StringIO('http://override.com'))
 
 
 @pytest.fixture
@@ -34,7 +34,7 @@ def test_start_urls_loader_not_configured(get_crawler):
 
 def test_start_urls_loader_should_register_signals(get_crawler, mocker):
     mock = mocker.patch('spider_feeder.file_handler.local.open')
-    mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
+    mock.side_effect = lambda x: StringIO('https://url1.com\nhttps://url2.com')
 
     crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 'file:///tmp/input_file.txt'})
     StartUrlsLoader.from_crawler(crawler)
@@ -47,7 +47,7 @@ def test_start_urls_loader_should_register_signals(get_crawler, mocker):
 
 def test_start_urls_loader_should_open_file_given_scheme(get_crawler, mocker):
     mock = mocker.patch('spider_feeder.file_handler.s3.open')
-    mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
+    mock.side_effect = lambda x: StringIO('https://url1.com\nhttps://url2.com')
 
     crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 's3://input_file.txt'})
     StartUrlsLoader.from_crawler(crawler)
@@ -60,7 +60,7 @@ def test_start_urls_loader_should_open_file_given_scheme(get_crawler, mocker):
 
 def test_no_scheme_should_load_local_file(get_crawler, mocker):
     mock = mocker.patch('spider_feeder.file_handler.local.open')
-    mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
+    mock.side_effect = lambda x: StringIO('https://url1.com\nhttps://url2.com')
 
     crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 'local.txt'})
     StartUrlsLoader.from_crawler(crawler)
@@ -86,7 +86,7 @@ def test_should_override_reader(get_crawler, mocker):
 
 def test_uri_format_spider_attributes(get_crawler, mocker):
     mock = mocker.patch('spider_feeder.file_handler.local.open')
-    mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
+    mock.side_effect = lambda x: StringIO('https://url1.com\nhttps://url2.com')
 
     crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': '%(dir)s/%(input_file)s.txt'})
     crawler.spider.dir = '/tmp'

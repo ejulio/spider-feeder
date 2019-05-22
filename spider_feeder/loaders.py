@@ -34,7 +34,7 @@ class StartUrlsLoader:
     def spider_openened(self, spider):
         input_file_uri = self._get_formatted_input_file_uri(spider)
         with self._open(input_file_uri) as f:
-            content = f.read().decode('utf-8')
+            content = f.read()
             spider.start_urls = content.splitlines()
 
     def _get_formatted_input_file_uri(self, spider):

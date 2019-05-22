@@ -1,5 +1,5 @@
-
 from spider_feeder.file_handler import local
+
 
 def test_open_local_file(mocker):
     mock = mocker.patch('spider_feeder.file_handler.local.builtins.open')

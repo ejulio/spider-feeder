@@ -37,7 +37,7 @@ def test_start_urls_loader_should_register_signals(get_crawler, mocker):
     mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
 
     crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 'file:///tmp/input_file.txt'})
-    loader = StartUrlsLoader.from_crawler(crawler)
+    StartUrlsLoader.from_crawler(crawler)
 
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
@@ -50,7 +50,7 @@ def test_start_urls_loader_should_open_file_given_scheme(get_crawler, mocker):
     mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
 
     crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 's3://input_file.txt'})
-    loader = StartUrlsLoader.from_crawler(crawler)
+    StartUrlsLoader.from_crawler(crawler)
 
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
@@ -63,7 +63,7 @@ def test_no_scheme_should_load_local_file(get_crawler, mocker):
     mock.side_effect = lambda x: BytesIO(b'https://url1.com\nhttps://url2.com')
 
     crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 'local.txt'})
-    loader = StartUrlsLoader.from_crawler(crawler)
+    StartUrlsLoader.from_crawler(crawler)
 
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
@@ -77,7 +77,7 @@ def test_should_override_reader(get_crawler, mocker):
             's3': 'tests.test_start_urls_loader.custom_reader'
         }
     })
-    loader = StartUrlsLoader.from_crawler(crawler)
+    StartUrlsLoader.from_crawler(crawler)
 
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
@@ -91,7 +91,7 @@ def test_uri_format_spider_attributes(get_crawler, mocker):
     crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': '%(dir)s/%(input_file)s.txt'})
     crawler.spider.dir = '/tmp'
     crawler.spider.input_file = 'spider_input'
-    loader = StartUrlsLoader.from_crawler(crawler)
+    StartUrlsLoader.from_crawler(crawler)
 
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 

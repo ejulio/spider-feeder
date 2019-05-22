@@ -10,7 +10,7 @@ from botocore.session import get_session
 def open(blob_uri):
     parsed = urlparse(blob_uri)
     settings = get_project_settings()
-    
+
     session = get_session()
     client = session.create_client(
         's3',

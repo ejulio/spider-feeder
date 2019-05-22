@@ -45,4 +45,3 @@ class StartUrlsLoader:
         parsed = urlparse(input_file_uri)
         open = load_object(self._file_handlers[parsed.scheme])
         return open(input_file_uri)
-        

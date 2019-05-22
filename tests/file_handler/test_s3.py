@@ -53,7 +53,7 @@ def botocore_client():
         stubber = Stubber(s3_client)
         session_mock = mocker.Mock()
         session_mock.create_client.return_value = s3_client
-        mock = mocker.patch('spider_feeder.file_handler.s3.get_session', return_value=session_mock)
+        mocker.patch('spider_feeder.file_handler.s3.get_session', return_value=session_mock)
         return (stubber, session_mock)
 
     return _client
@@ -80,7 +80,7 @@ def test_open_s3_blob_using_uri_credentials(botocore_client, mocker):
         expected_params = {'Bucket': 'bucket', 'Key': 'blob.txt'}
         stubber.add_response('get_object', response, expected_params)
 
-        fd = s3.open('s3://key_id:secret@bucket/blob.txt')
+        s3.open('s3://key_id:secret@bucket/blob.txt')
 
         session_mock.create_client.assert_called_once_with(
             's3',
@@ -102,7 +102,7 @@ def test_open_s3_blob_using_project_credentials(botocore_client, mocker):
         expected_params = {'Bucket': 'bucket', 'Key': 'blob.txt'}
         stubber.add_response('get_object', response, expected_params)
 
-        fd = s3.open('s3://bucket/blob.txt')
+        s3.open('s3://bucket/blob.txt')
 
         session_mock.create_client.assert_called_once_with(
             's3',

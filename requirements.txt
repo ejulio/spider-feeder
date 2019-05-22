@@ -1,0 +1,11 @@
+scrapy
+
+# for s3:// schemes
+botocore
+
+# testing
+pytest
+pytest-mock
+
+# PEP8 and style
+flake8

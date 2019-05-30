@@ -9,3 +9,7 @@ pytest-mock
 
 # PEP8 and style
 flake8
+
+# deployment
+twine
+wheel

@@ -62,6 +62,7 @@ def test_start_urls_loader_should_open_file_given_scheme(get_crawler, mocker):
 
     assert crawler.spider.start_urls == ['https://url1.com', 'https://url2.com']
     mock.assert_called_with('s3://input_file.txt', encoding='utf-8')
+    assert crawler.stats.get_value(f'spider_feeder/{crawler.spider.name}/url_count') == 2
 
 
 def test_no_scheme_should_load_local_file(get_crawler, mocker):

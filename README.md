@@ -4,7 +4,7 @@ spider-feeder is a library to help loading inputs to scrapy spiders.
 
 ## Install
 
-`pip install -e git@github.com:ejulio/spider-feeder.git#egg=spider_feeder`
+`pip install spider-feeder` or `pip install spider-feeder[s3]` to load files from AWS S3.
 
 ## Requirements
 

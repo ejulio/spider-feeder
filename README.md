@@ -41,6 +41,8 @@ This value is simply `len(spider.start_urls)`.
 * If _scheme_ (`local`, `s3`) is not provided, it'll use `local`
 * It can be formatted using spider attributes like `%(param)s` (similar to `FEED_URI` in scrapy)
 * Supported schemes are: `''` or `file` for local files and `s3` for AWS S3 (requires `botocore`)
+* When using `s3`, the URI must be formatted as `s3://key_id:secret_key@bucket/blob.txt`
+* If `key_id` and `secret_key` are not provided in the URI, they can be provided by the following settings: `SPIDERFEEDER_AWS_ACCESS_KEY_ID` and `SPIDERFEEDER_AWS_SECRET_ACCESS_KEY`.
 
 `SPIDERFEEDER_INPUT_FILE_ENCODING` sets the file encoding. DEFAULT = `'utf-8'`.
 

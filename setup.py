@@ -6,7 +6,7 @@ setup(
     version='0.1.0',
     url='https://github.com/ejulio/spider-feeder',
     author='Júlio César Batista',
-    author_email='julio@scrapinghub.com',
+    author_email='julio.batista@outlook.com',
     description='spider-feeder is a library to help loading inputs to scrapy spiders.',
     long_description='spider-feeder is a library to help loading inputs to scrapy spiders.',
     license='MIT',

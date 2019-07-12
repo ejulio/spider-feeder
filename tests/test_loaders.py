@@ -81,7 +81,7 @@ def test_should_override_reader(get_crawler, mocker):
     crawler = get_crawler({
         'SPIDERFEEDER_INPUT_FILE': 's3://input_file.txt',
         'SPIDERFEEDER_FILE_HANDLERS': {
-            's3': 'tests.test_start_urls_loader.custom_reader'
+            's3': 'tests.test_loaders.custom_reader'
         }
     })
     StartUrlsLoader.from_crawler(crawler)

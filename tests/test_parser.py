@@ -17,7 +17,6 @@ def test_parse_txt_content():
     assert urls == ['http://url1.com', 'http://url2.com', 'http://url3.com']
 
 
-
 def test_parse_csv_content():
     content = StringIO('\n'.join([
         'id,url',
@@ -36,7 +35,7 @@ def test_parse_csv_content():
 
 def test_csv_parser_fails_if_no_input_field():
     with pytest.raises(NotConfigured):
-        parser = CsvParser(Settings())
+        CsvParser(Settings())
 
 
 def test_parse_json_content():
@@ -56,4 +55,4 @@ def test_parse_json_content():
 
 def test_json_parser_fails_if_no_input_field():
     with pytest.raises(NotConfigured):
-        parser = JsonParser(Settings())
+        JsonParser(Settings())

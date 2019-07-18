@@ -13,7 +13,6 @@ class TxtParser:
         return fd.read().splitlines()
 
 
-
 class CsvParser:
 
     def __init__(self, settings):
@@ -33,7 +32,7 @@ class JsonParser:
             raise NotConfigured('Setting "SPIDERFEEDER_INPUT_FIELD" is required for json files.')
 
         self._field = settings['SPIDERFEEDER_INPUT_FIELD']
-    
+
     def parse(self, fd):
         data = json.load(fd)
         return list(map(lambda x: x[self._field], data))

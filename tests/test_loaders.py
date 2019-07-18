@@ -142,7 +142,7 @@ def test_file_encoding(get_crawler, mocker):
 
 
 def test_load_csv_file(get_crawler, mocker):
-    mock_open = mocker.patch('spider_feeder.file_handler.local.open')
+    mocker.patch('spider_feeder.file_handler.local.open')
     mock = mocker.patch('spider_feeder.parser.CsvParser')
     mock().parse.return_value = ['http://url1.com']
 
@@ -159,7 +159,7 @@ def test_load_csv_file(get_crawler, mocker):
 
 
 def test_load_json_file(get_crawler, mocker):
-    mock_open = mocker.patch('spider_feeder.file_handler.s3.open')    
+    mocker.patch('spider_feeder.file_handler.s3.open')
     mock = mocker.patch('spider_feeder.parser.JsonParser')
     mock().parse.return_value = ['http://url1.com']
 
@@ -175,7 +175,7 @@ def test_load_json_file(get_crawler, mocker):
 
 
 def test_load_file_custom_parser(get_crawler, mocker):
-    mock_open = mocker.patch('spider_feeder.file_handler.local.open')    
+    mocker.patch('spider_feeder.file_handler.local.open')
 
     crawler = get_crawler({
         'SPIDERFEEDER_INPUT_FILE': 'local.myext',

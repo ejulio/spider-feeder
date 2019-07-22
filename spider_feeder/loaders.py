@@ -69,8 +69,7 @@ class StartUrlsLoader:
     def _parse(self, fd, input_file_uri):
         (_, file_extension) = path.splitext(input_file_uri)
         file_extension = file_extension[1:]
+        logger.info(f'Parsing file {input_file_uri} with format {file_extension}.')
         parser_cls = load_object(self._file_parsers[file_extension])
-        print(self._file_parsers[file_extension])
-        print(parser_cls)
         parser = parser_cls(self._crawler.settings)
         return parser.parse(fd)

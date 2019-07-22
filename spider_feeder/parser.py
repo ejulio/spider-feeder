@@ -23,7 +23,7 @@ class CsvParser:
 
     def parse(self, fd):
         data = DictReader(fd)
-        return list(map(lambda x: x[self._field], data))
+        return [x[self._field] for x in data]
 
 
 class JsonParser:
@@ -35,4 +35,4 @@ class JsonParser:
 
     def parse(self, fd):
         data = json.load(fd)
-        return list(map(lambda x: x[self._field], data))
+        return [x[self._field] for x in data]

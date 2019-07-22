@@ -1,5 +1,6 @@
 # spider-feeder
 [![PyPI version](https://badge.fury.io/py/spider-feeder.svg)](https://badge.fury.io/py/spider-feeder)
+[![Build Status](https://api.travis-ci.com/ejulio/spider-feeder.png)](https://api.travis-ci.com/ejulio/spider-feeder.png)
 
 spider-feeder is a library to help loading inputs to scrapy spiders.
 

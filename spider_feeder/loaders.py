@@ -38,7 +38,7 @@ class StartUrlsLoader:
         encoding = crawler.settings.get('SPIDERFEEDER_INPUT_FILE_ENCODING', 'utf-8')
 
         extension = cls(crawler, input_file_uri, encoding, handlers, parsers)
-        crawler.signals.connect(extension.spider_openened, signal=signals.spider_opened)
+        crawler.signals.connect(extension.spider_opened, signal=signals.spider_opened)
         return extension
 
     def __init__(self, crawler, input_file_uri, file_encoding, handlers, parsers):
@@ -48,7 +48,7 @@ class StartUrlsLoader:
         self._file_encoding = file_encoding
         self._crawler = crawler
 
-    def spider_openened(self, spider):
+    def spider_opened(self, spider):
         input_file_uri = self._get_formatted_input_file_uri(spider)
         with self._open(input_file_uri) as f:
             spider.start_urls = self._parse(f, input_file_uri)

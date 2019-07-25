@@ -31,4 +31,5 @@ class ScrapinghubCollectionStore:
 
                 yield (data[self._input_field], data)
             else:
+                # TODO: Return dict {} instead of None
                 yield (data, None)

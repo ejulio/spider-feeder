@@ -16,23 +16,15 @@ class TxtParser:
 class CsvParser:
 
     def __init__(self, settings):
-        if 'SPIDERFEEDER_INPUT_FIELD' not in settings:
-            raise NotConfigured('Setting "SPIDERFEEDER_INPUT_FIELD" is required for csv files.')
-
-        self._field = settings['SPIDERFEEDER_INPUT_FIELD']
+        pass
 
     def parse(self, fd):
-        data = DictReader(fd)
-        return [x[self._field] for x in data]
+        return list(DictReader(fd))
 
 
 class JsonParser:
     def __init__(self, settings):
-        if 'SPIDERFEEDER_INPUT_FIELD' not in settings:
-            raise NotConfigured('Setting "SPIDERFEEDER_INPUT_FIELD" is required for json files.')
-
-        self._field = settings['SPIDERFEEDER_INPUT_FIELD']
+        pass
 
     def parse(self, fd):
-        data = json.load(fd)
-        return [x[self._field] for x in data]
+        return json.load(fd)

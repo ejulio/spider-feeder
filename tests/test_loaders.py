@@ -18,6 +18,15 @@ def return_string_io(content):
 custom_reader = Mock(side_effect=return_string_io('http://override.com'))
 
 
+class CustomParser:
+
+    def __init__(self, settings):
+        pass
+
+    def parse(self, fd):
+        return ['http://override.com']
+
+
 @pytest.fixture
 def get_crawler():
     def _crawler(extended_settings={}):
@@ -130,3 +139,52 @@ def test_file_encoding(get_crawler, mocker):
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
     mock.assert_called_with('local.txt', encoding='latin-1')
+
+
+def test_load_csv_file(get_crawler, mocker):
+    mocker.patch('spider_feeder.file_handler.local.open')
+    mock = mocker.patch('spider_feeder.parser.CsvParser')
+    mock().parse.return_value = ['http://url1.com']
+
+    crawler = get_crawler({
+        'SPIDERFEEDER_INPUT_FILE': 'local.csv',
+        'SPIDERFEEDER_INPUT_FILE_ENCODING': 'latin-1'
+    })
+    StartUrlsLoader.from_crawler(crawler)
+
+    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
+
+    mock.assert_called_with(crawler.settings)
+    assert crawler.spider.start_urls == ['http://url1.com']
+
+
+def test_load_json_file(get_crawler, mocker):
+    mocker.patch('spider_feeder.file_handler.s3.open')
+    mock = mocker.patch('spider_feeder.parser.JsonParser')
+    mock().parse.return_value = ['http://url1.com']
+
+    crawler = get_crawler({
+        'SPIDERFEEDER_INPUT_FILE': 's3://local.json',
+    })
+    StartUrlsLoader.from_crawler(crawler)
+
+    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
+
+    mock.assert_called_with(crawler.settings)
+    assert crawler.spider.start_urls == ['http://url1.com']
+
+
+def test_load_file_custom_parser(get_crawler, mocker):
+    mocker.patch('spider_feeder.file_handler.local.open')
+
+    crawler = get_crawler({
+        'SPIDERFEEDER_INPUT_FILE': 'local.myext',
+        'SPIDERFEEDER_FILE_PARSERS': {
+            'myext': 'tests.test_loaders.CustomParser'
+        }
+    })
+    StartUrlsLoader.from_crawler(crawler)
+
+    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
+
+    assert crawler.spider.start_urls == ['http://override.com']

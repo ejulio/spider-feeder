@@ -13,7 +13,7 @@ spider-feeder is a library to help loading inputs to scrapy spiders.
 * If using `s3`, it requires `botocore`
 * Otherwise, no requirements
 
-## Usage
+## Usage (plain text)
 
 Create a file `urls.txt` in your project with some urls (as in the example below).
 ```
@@ -37,6 +37,29 @@ Once the URLs were loaded, the total count will be stored in a stats
 `spider_feeder/<spider.name>/url_count`.
 This value is simply `len(spider.start_urls)`.
 
+## Usage (csv/json)
+
+Create a file `urls.csv` in your project with some urls (as in the example below).
+```
+id,input_url
+1,https://url1.com
+2,https://url2.com
+3,https://url3.com
+```
+
+Then, in `settings.py`
+```
+EXTENSIONS = {
+    'spider_feeder.loaders.StartUrlsLoader': 0
+}
+
+SPIDERFEEDER_INPUT_FILE = './urls.csv'
+SPIDERFEEDER_INPUT_FIELD = 'input_url'
+```
+
+The same applies for `json`, just requiring to update the file extension to `.json` instead of `.csv`.
+This means that the input file format is inferred from the given file extension.
+
 ## Settings
 
 `SPIDERFEEDER_INPUT_FILE` is an URI to a file.
@@ -48,12 +71,14 @@ This value is simply `len(spider.start_urls)`.
 
 `SPIDERFEEDER_INPUT_FILE_ENCODING` sets the file encoding. DEFAULT = `'utf-8'`.
 
+`SPIDERFEEDER_INPUT_FIELD` sets the url field when parsing `json` or `csv` files.
+
 `SPIDERFEEDER_FILE_HANDLERS` is a set of functions to be matched with the given file scheme.
 You can set your own and it'll be merged with the default one.
 The interface is just a plain function with two arguments `file_uri` and `encoding`.
 ```
 # settings.py
-SPIDERFEEDER_READERS = {
+SPIDERFEEDER_FILE_HANDLERS = {
     's3': 'myproject.my_custom_s3_reader.open'
 }
 
@@ -61,4 +86,23 @@ SPIDERFEEDER_READERS = {
 def open(file_uri, encoding):
     # my code here
     pass
+```
+
+`SPIDERFEEDER_FILE_PARSERS` is a set of parsers to be matched with the given file extension.
+You can set your own and it'll be merged with the default one.
+The interface is class with `__init__(settings: scrapy.Settings)` and `parse(fd: file object) -> List[str]` method.
+```
+# settings.py
+SPIDERFEEDER_FILE_PARSERS = {
+    's3': 'myproject.my_custom_parser.CustomParser'
+}
+
+# myproject.my_custom_parser.py
+class CustomParser:
+    def __init__(self, settings):
+        pass
+    
+    def parse(self, fd):
+        # some parsing strategy
+        return ['url1', 'url2']
 ```

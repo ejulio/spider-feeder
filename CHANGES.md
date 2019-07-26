@@ -4,6 +4,7 @@ All notable changes to this project are here.
 The top-most version is the newest one.
 
 * **Added** means a new feature
+* **Changed** means a new feature
 * **Fixed** means a bug fix
 
 Whenever possible, link the given PR with the feature/fix.
@@ -16,7 +17,11 @@ Whenever possible, link the given PR with the feature/fix.
 ### Added
 
 * Support for `.csv` and `.json` input files [PR#8](https://github.com/ejulio/spider-feeder/pull/8)
-* Support for Scrapinghub Collections [PR]()
+* Support for Scrapinghub Collections [PR#11](https://github.com/ejulio/spider-feeder/pull/11)
+
+### Changed
+
+* `SPIDERFEEDER_INPUT_FILE` setting to `SPIDERFEEDER_INPUT_URI`
 
 ## 0.1.0 (2019-05-30)
 

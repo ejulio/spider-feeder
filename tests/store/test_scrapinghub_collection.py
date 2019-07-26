@@ -45,9 +45,7 @@ def environment_vars_mocker(mocker):
 
 def test_load_urls_if_input_field_does_not_exist(mocker, environment_vars_mocker):
     scrapinghub_client_mock = scrapinghub_client_mocker(mocker, COLLECTION_OF_URLS_ONLY)
-    store = ScrapinghubCollectionStore(Settings({
-        'SPIDERFEEDER_INPUT_URI': f'collections://{COLLECTION_NAME}'
-    }))
+    store = ScrapinghubCollectionStore(f'collections://{COLLECTION_NAME}', Settings())
 
     expected_urls = [x['value'] for x in COLLECTION_OF_URLS_ONLY]
     store_urls = [url for (url, _) in store]
@@ -61,8 +59,7 @@ def test_load_urls_if_input_field_does_not_exist(mocker, environment_vars_mocker
 @pytest.mark.parametrize('field', ['', None])
 def test_load_urls_if_field_is_empty(field, mocker, environment_vars_mocker):
     scrapinghub_client_mocker(mocker, COLLECTION_OF_URLS_ONLY)
-    store = ScrapinghubCollectionStore(Settings({
-        'SPIDERFEEDER_INPUT_URI': f'collections://{COLLECTION_NAME}',
+    store = ScrapinghubCollectionStore(f'collections://{COLLECTION_NAME}', Settings({
         'SPIDERFEEDER_INPUT_FIELD': field
     }))
 
@@ -73,8 +70,7 @@ def test_load_urls_if_field_is_empty(field, mocker, environment_vars_mocker):
 
 def test_load_urls_and_meta(mocker, environment_vars_mocker):
     scrapinghub_client_mocker(mocker, COLLECTION_DATA)
-    store = ScrapinghubCollectionStore(Settings({
-        'SPIDERFEEDER_INPUT_URI': f'collections://{COLLECTION_NAME}',
+    store = ScrapinghubCollectionStore(f'collections://{COLLECTION_NAME}', Settings({
         'SPIDERFEEDER_INPUT_FIELD': 'input_url'
     }))
 
@@ -92,8 +88,7 @@ def test_load_urls_and_meta(mocker, environment_vars_mocker):
 
 def test_fail_if_input_field_collection_content_is_not_dict(mocker, environment_vars_mocker):
     scrapinghub_client_mocker(mocker, COLLECTION_OF_URLS_ONLY)
-    store = ScrapinghubCollectionStore(Settings({
-        'SPIDERFEEDER_INPUT_URI': f'collections://{COLLECTION_NAME}',
+    store = ScrapinghubCollectionStore(f'collections://{COLLECTION_NAME}', Settings({
         'SPIDERFEEDER_INPUT_FIELD': 'input_url'
     }))
 

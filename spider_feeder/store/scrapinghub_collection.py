@@ -12,14 +12,14 @@ class ScrapinghubCollectionStore:
     For more information, please refer to https://shub.readthedocs.io/en/stable/custom-images-contract.html.
     '''
 
-    def __init__(self, settings):
+    def __init__(self, input_uri, settings):
         self._input_field = settings.get('SPIDERFEEDER_INPUT_FIELD')
         client = ScrapinghubClient()
 
         jobkey = parse_job_key(os.environ['SHUB_JOBKEY'])
         project = client.get_project(jobkey.project_id)
 
-        collection_name = settings['SPIDERFEEDER_INPUT_URI'].replace('collections://', '')
+        collection_name = input_uri.replace('collections://', '')
         self._store = project.collections.get_store(collection_name)
 
     def __iter__(self):

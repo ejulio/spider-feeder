@@ -96,4 +96,4 @@ def test_fail_if_input_field_collection_content_is_not_dict(mocker, environment_
         for (url, meta) in store:
             pass
 
-    assert 'Collection data is expected to be a dict when SPIDERFEEDER_INPUT_FIELD is set.' == e.value.args[0]  # noqa
+    assert 'Data is expected to be a dict when SPIDERFEEDER_INPUT_FIELD is set.' == e.value.args[0]  # noqa

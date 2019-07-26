@@ -4,11 +4,12 @@ import logging
 
 from scrapy.utils.misc import load_object
 
+from .base_store import BaseStore
 
 logger = logging.getLogger(__name__)
 
 
-class FileStore:
+class FileStore(BaseStore):
     '''Store class abstracting an input file.
     It can handle file stored in the local file system or in Amazon AWS S3.
     This is extensible by adding the given URI scheme to `SPIDERFEEDER_FILE_HANDLERS`.
@@ -34,10 +35,10 @@ class FileStore:
     }
 
     def __init__(self, input_file_uri, settings):
+        super().__init__(settings)
         self._input_file_uri = input_file_uri
         self._settings = settings
         self._file_encoding = settings.get('SPIDERFEEDER_INPUT_FILE_ENCODING', 'utf-8')
-        self._input_field = settings.get('SPIDERFEEDER_INPUT_FIELD')
 
         handlers = settings.getdict('SPIDERFEEDER_FILE_HANDLERS', {})
         self._handlers = dict(self.FILE_HANDLERS, **handlers)
@@ -58,13 +59,6 @@ class FileStore:
         parser = load_object(self._parsers[file_extension])
         return parser(fd, self._settings)
 
-    def __iter__(self):
+    def read_input_items(self):
         with self._open() as fd:
-            for item in self._parse(fd):
-                if self._input_field:
-                    if not isinstance(item, dict):
-                        raise TypeError('Data is expected to be a dict when SPIDERFEEDER_INPUT_FIELD is set.')  # noqa
-
-                    yield (item[self._input_field], item)
-                else:
-                    yield (item, {})
+            return self._parse(fd)

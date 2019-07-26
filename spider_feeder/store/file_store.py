@@ -9,6 +9,17 @@ logger = logging.getLogger(__name__)
 
 
 class FileStore:
+    '''Store class abstracting an input file.
+    It can handle file stored in the local file system or in Amazon AWS S3.
+    This is extensible by adding the given URI scheme to `SPIDERFEEDER_FILE_HANDLERS`.
+    
+    The file formats handled are txt, csv and json.
+    If a new file format is required, it is just a matter of adding the file extension to
+    `SPIDERFEEDER_FILE_HANDLERS`.
+    For csv and json files, the URL is read from the field set in `SPIDERFEEDER_INPUT_FIELD`.
+
+    The standard file encoding is _utf-8_, but it can be changed through `SPIDERFEEDER_INPUT_FILE_ENCODING`.
+    '''
 
     FILE_HANDLERS = {
         '': 'spider_feeder.file_handler.local.open',

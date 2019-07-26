@@ -1,10 +1,19 @@
 import json
 from io import StringIO
+from unittest.mock import Mock
 
 from scrapy.settings import Settings
 import pytest
 
 from spider_feeder.store.file_store import FileStore
+
+
+def custom_open():
+    pass
+
+
+def custom_parser():
+    pass
 
 
 @pytest.mark.parametrize('uri_scheme, file_opener', [
@@ -123,3 +132,43 @@ def test_file_encoding(mocker):
         pass
 
     mock.assert_called_with('temp.txt', encoding='latin-1')
+
+
+def test_custom_file_handler(mocker):
+    mock = mocker.patch('tests.store.test_file_store.custom_open')
+    mock.return_value = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
+    
+    store = FileStore('sc://temp.txt', Settings({
+        'SPIDERFEEDER_FILE_HANDLERS': {
+            'sc': 'tests.store.test_file_store.custom_open'
+        }
+    }))
+
+    for (url, meta) in store:
+        pass
+
+    mock.assert_called_with('sc://temp.txt', encoding='utf-8')
+
+
+def test_custom_file_handler(mocker):
+    content = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
+    mocker.patch(
+        'spider_feeder.file_handler.local.open',
+        return_value=content,
+        autospec=True
+    )
+    
+    mock = mocker.patch('tests.store.test_file_store.custom_parser')
+    mock.return_value = []
+
+    settings = Settings({
+        'SPIDERFEEDER_FILE_PARSERS': {
+            'abc': 'tests.store.test_file_store.custom_parser'
+        }
+    })
+    store = FileStore('temp.abc', settings)
+
+    for (url, meta) in store:
+        pass
+
+    mock.assert_called_with(content, settings)

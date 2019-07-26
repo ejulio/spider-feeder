@@ -59,11 +59,12 @@ class FileStore:
         return parser(fd, self._settings)
 
     def __iter__(self):
-        for item in self._parse(self._open()):
-            if self._input_field:
-                if not isinstance(item, dict):
-                    raise TypeError('Data is expected to be a dict when SPIDERFEEDER_INPUT_FIELD is set.')  # noqa
+        with self._open() as fd:
+            for item in self._parse(fd):
+                if self._input_field:
+                    if not isinstance(item, dict):
+                        raise TypeError('Data is expected to be a dict when SPIDERFEEDER_INPUT_FIELD is set.')  # noqa
 
-                yield (item[self._input_field], item)
-            else:
-                yield (item, {})
+                    yield (item[self._input_field], item)
+                else:
+                    yield (item, {})

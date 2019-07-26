@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 class StartUrlsLoader:
-    '''Loads a set of input urls in spider.start_urls.
+    '''Loads a set of input urls to `spider.start_urls`.
     The URLs are loaded from `SPIDERFEEDER_INPUT_URI`.
     The given store is loaded according to the scheme in `SPIDERFEEDER_INPUT_URI`.
     Currently, the support is for local file system, Amazon AWS S3, and Scrapinghub Collections.
@@ -33,7 +33,7 @@ class StartUrlsLoader:
             raise NotConfigured('StartUrlsLoader requires SPIDERFEEDER_INPUT_URI setting.')
 
         stores = cls.STORES
-        stores = dict(stores, **crawler.settings.get('SPIDERFEEDER_STORES', {}))
+        stores = dict(stores, **crawler.settings.getdict('SPIDERFEEDER_STORES', {}))
 
         extension = cls(crawler, input_uri, stores)
         crawler.signals.connect(extension.spider_opened, signal=signals.spider_opened)

@@ -5,7 +5,7 @@ import pytest
 from scrapy.settings import Settings
 from scrapy.exceptions import NotConfigured
 
-from spider_feeder import parser
+from spider_feeder.store import parser
 
 
 def test_parse_txt_content():

@@ -6,7 +6,7 @@ import botocore.session
 from botocore.stub import Stubber
 from botocore.response import StreamingBody
 
-from spider_feeder.file_handler import s3
+from spider_feeder.store.file_handler import s3
 
 
 def get_object_response(content, encoding='utf-8'):
@@ -53,7 +53,7 @@ def botocore_client():
         stubber = Stubber(s3_client)
         session_mock = mocker.Mock()
         session_mock.create_client.return_value = s3_client
-        mocker.patch('spider_feeder.file_handler.s3.get_session', return_value=session_mock)
+        mocker.patch('spider_feeder.store.file_handler.s3.get_session', return_value=session_mock)
         return (stubber, session_mock)
 
     return _client
@@ -111,7 +111,7 @@ def test_open_s3_blob_using_uri_credentials(botocore_client, mocker):
 
 def test_open_s3_blob_using_project_credentials(botocore_client, mocker):
     (stubber, session_mock) = botocore_client(mocker)
-    settings_mock = mocker.patch('spider_feeder.file_handler.s3.get_project_settings')
+    settings_mock = mocker.patch('spider_feeder.store.file_handler.s3.get_project_settings')
     settings_mock.return_value = {
         'SPIDERFEEDER_AWS_ACCESS_KEY_ID': 'key_id',
         'SPIDERFEEDER_AWS_SECRET_ACCESS_KEY': 'secret'

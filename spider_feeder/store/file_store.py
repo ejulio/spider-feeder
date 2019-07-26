@@ -22,15 +22,15 @@ class FileStore:
     '''
 
     FILE_HANDLERS = {
-        '': 'spider_feeder.file_handler.local.open',
-        'file': 'spider_feeder.file_handler.local.open',
-        's3': 'spider_feeder.file_handler.s3.open',
+        '': 'spider_feeder.store.file_handler.local.open',
+        'file': 'spider_feeder.store.file_handler.local.open',
+        's3': 'spider_feeder.store.file_handler.s3.open',
     }
 
     FILE_PARSERS = {
-        'txt': 'spider_feeder.parser.parse_txt',
-        'csv': 'spider_feeder.parser.parse_csv',
-        'json': 'spider_feeder.parser.parse_json',
+        'txt': 'spider_feeder.store.parser.parse_txt',
+        'csv': 'spider_feeder.store.parser.parse_csv',
+        'json': 'spider_feeder.store.parser.parse_json',
     }
 
     def __init__(self, input_file_uri, settings):

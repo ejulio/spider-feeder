@@ -17,9 +17,9 @@ def custom_parser():
 
 
 @pytest.mark.parametrize('uri_scheme, file_opener', [
-    ('file://', 'spider_feeder.file_handler.local.open'),
-    ('s3://', 'spider_feeder.file_handler.s3.open'),
-    ('', 'spider_feeder.file_handler.local.open'),
+    ('file://', 'spider_feeder.store.file_handler.local.open'),
+    ('s3://', 'spider_feeder.store.file_handler.s3.open'),
+    ('', 'spider_feeder.store.file_handler.local.open'),
 ])
 def test_load_txt_file(mocker, uri_scheme, file_opener):
     file_content = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
@@ -39,9 +39,9 @@ def test_load_txt_file(mocker, uri_scheme, file_opener):
 
 
 @pytest.mark.parametrize('uri_scheme, file_opener', [
-    ('file://', 'spider_feeder.file_handler.local.open'),
-    ('s3://', 'spider_feeder.file_handler.s3.open'),
-    ('', 'spider_feeder.file_handler.local.open'),
+    ('file://', 'spider_feeder.store.file_handler.local.open'),
+    ('s3://', 'spider_feeder.store.file_handler.s3.open'),
+    ('', 'spider_feeder.store.file_handler.local.open'),
 ])
 def test_load_csv_file(mocker, uri_scheme, file_opener):
     file_content = StringIO('\n'.join([
@@ -70,9 +70,9 @@ def test_load_csv_file(mocker, uri_scheme, file_opener):
 
 
 @pytest.mark.parametrize('uri_scheme, file_opener', [
-    ('file://', 'spider_feeder.file_handler.local.open'),
-    ('s3://', 'spider_feeder.file_handler.s3.open'),
-    ('', 'spider_feeder.file_handler.local.open'),
+    ('file://', 'spider_feeder.store.file_handler.local.open'),
+    ('s3://', 'spider_feeder.store.file_handler.s3.open'),
+    ('', 'spider_feeder.store.file_handler.local.open'),
 ])
 def test_load_json_file(mocker, uri_scheme, file_opener):
     file_content = StringIO(json.dumps([
@@ -101,7 +101,7 @@ def test_load_json_file(mocker, uri_scheme, file_opener):
 
 def test_fail_if_input_field_and_not_dict_data(mocker):
     mock = mocker.patch(
-        'spider_feeder.file_handler.local.open',
+        'spider_feeder.store.file_handler.local.open',
         return_value=StringIO('\n'.join(['http://url1.com', 'http://url2.com'])),
         autospec=True
     )
@@ -119,7 +119,7 @@ def test_fail_if_input_field_and_not_dict_data(mocker):
 
 def test_file_encoding(mocker):
     mock = mocker.patch(
-        'spider_feeder.file_handler.local.open',
+        'spider_feeder.store.file_handler.local.open',
         return_value=StringIO('\n'.join(['http://url1.com', 'http://url2.com'])),
         autospec=True
     )
@@ -153,7 +153,7 @@ def test_custom_file_handler(mocker):
 def test_custom_file_handler(mocker):
     content = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
     mocker.patch(
-        'spider_feeder.file_handler.local.open',
+        'spider_feeder.store.file_handler.local.open',
         return_value=content,
         autospec=True
     )

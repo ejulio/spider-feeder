@@ -10,6 +10,14 @@ logger = logging.getLogger(__name__)
 
 
 class StartUrlsLoader:
+    '''Loads a set of input urls in spider.start_urls.
+    The URLs are loaded from `SPIDERFEEDER_INPUT_URI`.
+    The given store is loaded according to the scheme in `SPIDERFEEDER_INPUT_URI`.
+    Currently, the support is for local file system, Amazon AWS S3, and Scrapinghub Collections.
+    The stores can be overriden or aggregated through `SPIDERFEEDER_STORES`.
+
+    `SPIDERFEEDER_INPUT_URI` supports %(params) as in scrapy's `FEED_URI`.
+    '''
 
     STORES = {
         '': 'spider_feeder.store.file_store.FileStore',

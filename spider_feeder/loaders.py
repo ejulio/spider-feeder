@@ -11,65 +11,44 @@ logger = logging.getLogger(__name__)
 
 class StartUrlsLoader:
 
-    FILE_HANDLERS = {
-        '': 'spider_feeder.file_handler.local.open',
-        'file': 'spider_feeder.file_handler.local.open',
-        's3': 'spider_feeder.file_handler.s3.open',
-    }
-
-    FILE_PARSERS = {
-        'txt': 'spider_feeder.parser.TxtParser',
-        'csv': 'spider_feeder.parser.CsvParser',
-        'json': 'spider_feeder.parser.JsonParser',
+    STORES = {
+        '': 'spider_feeder.store.file_store.FileStore',
+        'file': 'spider_feeder.store.file_store.FileStore',
+        's3': 'spider_feeder.store.file_store.FileStore',
+        'collections': 'spider_feeder.store.scrapinghub_collection.ScrapinghubCollectionStore',
     }
 
     @classmethod
     def from_crawler(cls, crawler):
-        input_file_uri = crawler.settings.get('SPIDERFEEDER_INPUT_FILE', None)
-        if not input_file_uri:
-            raise NotConfigured('StartUrlsLoader requires SPIDERFEEDER_INPUT_FILE setting.')
+        input_uri = crawler.settings.get('SPIDERFEEDER_INPUT_URI', None)
+        if not input_uri:
+            raise NotConfigured('StartUrlsLoader requires SPIDERFEEDER_INPUT_URI setting.')
 
-        handlers = crawler.settings.getdict('SPIDERFEEDER_FILE_HANDLERS', {})
-        handlers = dict(cls.FILE_HANDLERS, **handlers)
+        stores = cls.STORES
+        stores = dict(stores, **crawler.settings.get('SPIDERFEEDER_STORES', {}))
 
-        parsers = crawler.settings.getdict('SPIDERFEEDER_FILE_PARSERS', {})
-        parsers = dict(cls.FILE_PARSERS, **parsers)
-
-        encoding = crawler.settings.get('SPIDERFEEDER_INPUT_FILE_ENCODING', 'utf-8')
-
-        extension = cls(crawler, input_file_uri, encoding, handlers, parsers)
+        extension = cls(crawler, input_uri, stores)
         crawler.signals.connect(extension.spider_opened, signal=signals.spider_opened)
         return extension
 
-    def __init__(self, crawler, input_file_uri, file_encoding, handlers, parsers):
-        self._input_file_uri = input_file_uri
-        self._file_handlers = handlers
-        self._file_parsers = parsers
-        self._file_encoding = file_encoding
+    def __init__(self, crawler, input_uri, stores):
+        self._input_uri = input_uri
         self._crawler = crawler
+        self._stores = stores
 
     def spider_opened(self, spider):
-        input_file_uri = self._get_formatted_input_file_uri(spider)
-        with self._open(input_file_uri) as f:
-            spider.start_urls = self._parse(f, input_file_uri)
-            n_urls = len(spider.start_urls)
-            logger.info(f'Loaded {n_urls} urls from {input_file_uri}.')
-            self._crawler.stats.set_value(f'spider_feeder/{spider.name}/url_count', n_urls)
+        input_uri = self._get_formatted_input_uri(spider)
+        store = self._get_store(input_uri)
+        spider.start_urls = [url for (url, _) in store]
+        n_urls = len(spider.start_urls)
+        logger.info(f'Loaded {n_urls} urls from {input_uri}.')
+        self._crawler.stats.set_value(f'spider_feeder/{spider.name}/url_count', n_urls)
 
-    def _get_formatted_input_file_uri(self, spider):
+    def _get_formatted_input_uri(self, spider):
         params = {k: getattr(spider, k) for k in dir(spider)}
-        return self._input_file_uri % params
+        return self._input_uri % params
 
-    def _open(self, input_file_uri):
-        parsed = urlparse(input_file_uri)
-        open = load_object(self._file_handlers[parsed.scheme])
-        logger.info(f'Opening file {input_file_uri} with scheme {parsed.scheme}.')
-        return open(input_file_uri, encoding=self._file_encoding)
-
-    def _parse(self, fd, input_file_uri):
-        (_, file_extension) = path.splitext(input_file_uri)
-        file_extension = file_extension[1:]
-        logger.info(f'Parsing file {input_file_uri} with format {file_extension}.')
-        parser_cls = load_object(self._file_parsers[file_extension])
-        parser = parser_cls(self._crawler.settings)
-        return parser.parse(fd)
+    def _get_store(self, input_uri):
+        parsed = urlparse(input_uri)
+        store_cls = load_object(self._stores[parsed.scheme])
+        return store_cls(input_uri, self._crawler.settings)

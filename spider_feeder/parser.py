@@ -1,30 +1,14 @@
 import json
 from csv import DictReader
 
-from scrapy.exceptions import NotConfigured
+
+def parse_txt(fd, settings):
+    return fd.read().splitlines()
 
 
-class TxtParser:
-
-    def __init__(self, settings):
-        pass
-
-    def parse(self, fd):
-        return fd.read().splitlines()
+def parse_csv(fd, settings):
+    return [dict(x) for x in DictReader(fd)]
 
 
-class CsvParser:
-
-    def __init__(self, settings):
-        pass
-
-    def parse(self, fd):
-        return list(DictReader(fd))
-
-
-class JsonParser:
-    def __init__(self, settings):
-        pass
-
-    def parse(self, fd):
-        return json.load(fd)
+def parse_json(fd, settings):
+    return json.load(fd)

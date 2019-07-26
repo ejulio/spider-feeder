@@ -5,14 +5,13 @@ import pytest
 from scrapy.settings import Settings
 from scrapy.exceptions import NotConfigured
 
-from spider_feeder.parser import CsvParser, TxtParser, JsonParser
+from spider_feeder import parser
 
 
 def test_parse_txt_content():
     content = StringIO('http://url1.com\nhttp://url2.com\nhttp://url3.com')
 
-    parser = TxtParser(Settings())
-    urls = parser.parse(content)
+    urls = parser.parse_txt(content, Settings())
 
     assert urls == ['http://url1.com', 'http://url2.com', 'http://url3.com']
 
@@ -25,17 +24,11 @@ def test_parse_csv_content():
         '3,"http://url3.com"',
     ]))
 
-    parser = CsvParser(Settings({
-        'SPIDERFEEDER_INPUT_FIELD': 'url'
-    }))
-    urls = parser.parse(content)
-
-    assert urls == ['http://url1.com', 'http://url2.com', 'http://url3.com']
-
-
-def test_csv_parser_fails_if_no_input_field():
-    with pytest.raises(NotConfigured):
-        CsvParser(Settings())
+    assert parser.parse_csv(content, Settings()) == [
+        {'id': '1', 'url': 'http://url1.com'},
+        {'id': '2', 'url': 'http://url2.com'},
+        {'id': '3', 'url': 'http://url3.com'},
+    ]
 
 
 def test_parse_json_content():
@@ -45,14 +38,8 @@ def test_parse_json_content():
         {'id': 3, 'input_url': 'http://url3.com'},
     ]))
 
-    parser = JsonParser(Settings({
-        'SPIDERFEEDER_INPUT_FIELD': 'input_url'
-    }))
-    urls = parser.parse(content)
-
-    assert urls == ['http://url1.com', 'http://url2.com', 'http://url3.com']
-
-
-def test_json_parser_fails_if_no_input_field():
-    with pytest.raises(NotConfigured):
-        JsonParser(Settings())
+    assert parser.parse_json(content, Settings()) == [
+        {'id': 1, 'input_url': 'http://url1.com'},
+        {'id': 2, 'input_url': 'http://url2.com'},
+        {'id': 3, 'input_url': 'http://url3.com'},
+    ]

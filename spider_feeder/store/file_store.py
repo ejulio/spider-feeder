@@ -28,9 +28,9 @@ class FileStore:
     }
 
     FILE_PARSERS = {
-        'txt': 'spider_feeder.parser.TxtParser',
-        'csv': 'spider_feeder.parser.CsvParser',
-        'json': 'spider_feeder.parser.JsonParser',
+        'txt': 'spider_feeder.parser.parse_txt',
+        'csv': 'spider_feeder.parser.parse_csv',
+        'json': 'spider_feeder.parser.parse_json',
     }
 
     def __init__(self, input_file_uri, settings):
@@ -55,9 +55,8 @@ class FileStore:
         (_, file_extension) = path.splitext(self._input_file_uri)
         file_extension = file_extension[1:]
         logger.info(f'Parsing file {self._input_file_uri} with format {file_extension}.')
-        parser_cls = load_object(self._parsers[file_extension])
-        parser = parser_cls(self._settings)
-        return parser.parse(fd)
+        parser = load_object(self._parsers[file_extension])
+        return parser(fd, self._settings)
 
     def __iter__(self):
         for item in self._parse(self._open()):

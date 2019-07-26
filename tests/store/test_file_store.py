@@ -1,6 +1,5 @@
 import json
 from io import StringIO
-from unittest.mock import Mock
 
 from scrapy.settings import Settings
 import pytest
@@ -100,7 +99,7 @@ def test_load_json_file(mocker, uri_scheme, file_opener):
 
 
 def test_fail_if_input_field_and_not_dict_data(mocker):
-    mock = mocker.patch(
+    mocker.patch(
         'spider_feeder.store.file_handler.local.open',
         return_value=StringIO('\n'.join(['http://url1.com', 'http://url2.com'])),
         autospec=True
@@ -137,7 +136,7 @@ def test_file_encoding(mocker):
 def test_custom_file_handler(mocker):
     mock = mocker.patch('tests.store.test_file_store.custom_open')
     mock.return_value = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
-    
+
     store = FileStore('sc://temp.txt', Settings({
         'SPIDERFEEDER_FILE_HANDLERS': {
             'sc': 'tests.store.test_file_store.custom_open'
@@ -150,14 +149,14 @@ def test_custom_file_handler(mocker):
     mock.assert_called_with('sc://temp.txt', encoding='utf-8')
 
 
-def test_custom_file_handler(mocker):
+def test_custom_file_parser(mocker):
     content = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
     mocker.patch(
         'spider_feeder.store.file_handler.local.open',
         return_value=content,
         autospec=True
     )
-    
+
     mock = mocker.patch('tests.store.test_file_store.custom_parser')
     mock.return_value = []
 

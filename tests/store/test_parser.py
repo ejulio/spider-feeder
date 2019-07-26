@@ -1,9 +1,7 @@
 import json
 from io import StringIO
 
-import pytest
 from scrapy.settings import Settings
-from scrapy.exceptions import NotConfigured
 
 from spider_feeder.store import parser
 

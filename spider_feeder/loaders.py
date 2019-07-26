@@ -1,6 +1,5 @@
 from urllib.parse import urlparse
 import logging
-from os import path
 
 from scrapy import signals
 from scrapy.exceptions import NotConfigured

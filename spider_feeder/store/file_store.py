@@ -12,7 +12,7 @@ class FileStore:
     '''Store class abstracting an input file.
     It can handle file stored in the local file system or in Amazon AWS S3.
     This is extensible by adding the given URI scheme to `SPIDERFEEDER_FILE_HANDLERS`.
-    
+
     The file formats handled are txt, csv and json.
     If a new file format is required, it is just a matter of adding the file extension to
     `SPIDERFEEDER_FILE_HANDLERS`.

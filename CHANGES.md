@@ -16,6 +16,7 @@ Whenever possible, link the given PR with the feature/fix.
 ### Added
 
 * Support for `.csv` and `.json` input files [PR#8](https://github.com/ejulio/spider-feeder/pull/8)
+* Support for Scrapinghub Collections [PR]()
 
 ## 0.1.0 (2019-05-30)
 

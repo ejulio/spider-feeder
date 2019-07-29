@@ -12,6 +12,6 @@ class BaseStore:
                 yield (item[self._input_field], item)
             else:
                 yield (item, {})
-    
+
     def read_input_items(self):
         raise NotImplementedError()

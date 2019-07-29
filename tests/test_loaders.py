@@ -36,7 +36,7 @@ def test_start_urls_loader_not_configured(get_crawler):
     ('s3://', 'spider_feeder.store.file_store.FileStore'),
     ('file://', 'spider_feeder.store.file_store.FileStore'),
     ('', 'spider_feeder.store.file_store.FileStore'),
-    ('collections://', 'spider_feeder.store.scrapinghub_collection.ScrapinghubCollectionStore'),
+    ('hubstorage://', 'spider_feeder.store.scrapinghub_collection.ScrapinghubCollectionStore'),
 ])
 def test_start_urls_loader_open_store_given_scheme(get_crawler, mocker, scheme, store_cls):
     mock = mocker.patch(store_cls)

@@ -45,7 +45,7 @@ def test_start_urls_loader_open_store_given_scheme(get_crawler, mocker, scheme, 
 
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
-    assert crawler.spider.start_urls == ['https://url1.com', 'https://url2.com']
+    assert list(crawler.spider.start_urls) == ['https://url1.com', 'https://url2.com']
     mock.assert_called_with(f'{scheme}input_file.txt', crawler.settings)
     assert crawler.stats.get_value(f'spider_feeder/{crawler.spider.name}/url_count') == 2
 

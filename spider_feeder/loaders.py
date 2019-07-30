@@ -65,29 +65,41 @@ class StartUrlsLoader(BaseLoader):
     '''Loader setting spider.start_urls. For more information, please refer to BaseLoader.'''
 
     def set_spider_input_data(self, spider, store):
-        spider.start_urls = [url for (url, _) in store]
-        n_urls = len(spider.start_urls)
-        self._crawler.stats.set_value(f'spider_feeder/{spider.name}/url_count', n_urls)
+        spider.start_urls = _StartDataIter(
+            self._crawler,
+            spider,
+            store,
+            generator_fn=lambda url, meta: url
+        )
 
 
 class StartRequestsLoader(BaseLoader):
     '''Loader setting spider.start_requests. For more information, please refer to BaseLoader.'''
 
     def set_spider_input_data(self, spider, store):
-        spider.start_requests = _StartRequestsIter(self._crawler, spider, store)
+        spider.start_requests = _StartDataIter(
+            self._crawler,
+            spider,
+            store,
+            generator_fn=lambda url, meta: Request(url, meta=meta)
+        )
 
 
-class _StartRequestsIter:
+class _StartDataIter:
 
-    def __init__(self, crawler, spider, store):
+    def __init__(self, crawler, spider, store, generator_fn):
         self._crawler = crawler
         self._spider = spider
         self._store = store
+        self._generator_fn = generator_fn
 
     def __call__(self):
+        yield from self
+
+    def __iter__(self):
         n_urls = 0
         for (url, meta) in self._store:
-            yield Request(url, meta=meta)
+            yield self._generator_fn(url, meta)
             n_urls += 1
 
         self._crawler.stats.set_value(f'spider_feeder/{self._spider.name}/url_count', n_urls)

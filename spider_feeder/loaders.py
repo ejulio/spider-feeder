@@ -74,10 +74,11 @@ class StartRequestsLoader(BaseLoader):
     '''Loader setting spider.start_requests. For more information, please refer to BaseLoader.'''
 
     def set_spider_input_data(self, spider, store):
-        spider.start_requests = _StartRequestsLoader(self._crawler, spider, store)
+        spider.start_requests = _StartRequestsIter(self._crawler, spider, store)
 
 
-class _StartRequestsLoader:
+class _StartRequestsIter:
+
     def __init__(self, crawler, spider, store):
         self._crawler = crawler
         self._spider = spider

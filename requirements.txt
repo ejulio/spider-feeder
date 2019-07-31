@@ -3,6 +3,9 @@ scrapy
 # for s3:// schemes
 botocore
 
+# for scrapinghub collection
+scrapinghub
+
 # testing
 pytest
 pytest-mock

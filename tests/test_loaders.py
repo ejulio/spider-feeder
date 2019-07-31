@@ -1,4 +1,3 @@
-from io import StringIO
 from unittest.mock import Mock
 
 import pytest
@@ -9,22 +8,8 @@ from scrapy.exceptions import NotConfigured
 from spider_feeder.loaders import StartUrlsLoader
 
 
-def return_string_io(content):
-    def fn(file_path, encoding):
-        return StringIO(content)
-    return fn
-
-
-custom_reader = Mock(side_effect=return_string_io('http://override.com'))
-
-
-class CustomParser:
-
-    def __init__(self, settings):
-        pass
-
-    def parse(self, fd):
-        return ['http://override.com']
+CustomS3Store = Mock()
+CustomAbcStore = Mock()
 
 
 @pytest.fixture
@@ -47,144 +32,63 @@ def test_start_urls_loader_not_configured(get_crawler):
         StartUrlsLoader.from_crawler(crawler)
 
 
-def test_start_urls_loader_should_register_signals(get_crawler, mocker):
-    mock = mocker.patch('spider_feeder.file_handler.local.open')
-    mock.side_effect = return_string_io('https://url1.com\nhttps://url2.com')
+@pytest.mark.parametrize('scheme, store_cls', [
+    ('s3://', 'spider_feeder.store.file_store.FileStore'),
+    ('file://', 'spider_feeder.store.file_store.FileStore'),
+    ('', 'spider_feeder.store.file_store.FileStore'),
+    ('collections://', 'spider_feeder.store.scrapinghub_collection.ScrapinghubCollectionStore'),
+])
+def test_start_urls_loader_open_store_given_scheme(get_crawler, mocker, scheme, store_cls):
+    mock = mocker.patch(store_cls)
+    mock().__iter__.return_value = iter([('https://url1.com', {}), ('https://url2.com', {})])
 
-    crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 'file:///tmp/input_file.txt'})
+    crawler = get_crawler({'SPIDERFEEDER_INPUT_URI': f'{scheme}input_file.txt'})
     StartUrlsLoader.from_crawler(crawler)
 
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
     assert crawler.spider.start_urls == ['https://url1.com', 'https://url2.com']
-    mock.assert_called_with('file:///tmp/input_file.txt', encoding='utf-8')
-
-
-def test_start_urls_loader_should_open_file_given_scheme(get_crawler, mocker):
-    mock = mocker.patch('spider_feeder.file_handler.s3.open')
-    mock.side_effect = return_string_io('https://url1.com\nhttps://url2.com')
-
-    crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 's3://input_file.txt'})
-    StartUrlsLoader.from_crawler(crawler)
-
-    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
-
-    assert crawler.spider.start_urls == ['https://url1.com', 'https://url2.com']
-    mock.assert_called_with('s3://input_file.txt', encoding='utf-8')
+    mock.assert_called_with(f'{scheme}input_file.txt', crawler.settings)
     assert crawler.stats.get_value(f'spider_feeder/{crawler.spider.name}/url_count') == 2
 
 
-def test_no_scheme_should_load_local_file(get_crawler, mocker):
-    mock = mocker.patch('spider_feeder.file_handler.local.open')
-    mock.side_effect = return_string_io('https://url1.com\nhttps://url2.com')
-
-    crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 'local.txt'})
-    StartUrlsLoader.from_crawler(crawler)
-
-    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
-
-    mock.assert_called_with('local.txt', encoding='utf-8')
-
-
-def test_should_override_reader(get_crawler, mocker):
+def test_should_override_store(get_crawler, mocker):
     crawler = get_crawler({
-        'SPIDERFEEDER_INPUT_FILE': 's3://input_file.txt',
-        'SPIDERFEEDER_FILE_HANDLERS': {
-            's3': 'tests.test_loaders.custom_reader'
+        'SPIDERFEEDER_INPUT_URI': 's3://input_file.txt',
+        'SPIDERFEEDER_STORES': {
+            's3': 'tests.test_loaders.CustomS3Store'
         }
     })
     StartUrlsLoader.from_crawler(crawler)
 
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
-    assert crawler.spider.start_urls == ['http://override.com']
+    CustomS3Store.assert_called_once_with('s3://input_file.txt', crawler.settings)
+
+
+def test_should_custom_store(get_crawler, mocker):
+    crawler = get_crawler({
+        'SPIDERFEEDER_INPUT_URI': 'abc://input_file.txt',
+        'SPIDERFEEDER_STORES': {
+            'abc': 'tests.test_loaders.CustomAbcStore'
+        }
+    })
+    StartUrlsLoader.from_crawler(crawler)
+
+    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
+
+    CustomAbcStore.assert_called_once_with('abc://input_file.txt', crawler.settings)
 
 
 def test_uri_format_spider_attributes(get_crawler, mocker):
-    mock = mocker.patch('spider_feeder.file_handler.local.open')
-    mock.side_effect = return_string_io('https://url1.com\nhttps://url2.com')
+    mock = mocker.patch('spider_feeder.store.file_store.FileStore')
+    mock().__iter__.return_value = iter([('https://url1.com', {}), ('https://url2.com', {})])
 
-    crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': '%(dir)s/%(input_file)s.txt'})
+    crawler = get_crawler({'SPIDERFEEDER_INPUT_URI': '%(dir)s/%(input_file)s.txt'})
     crawler.spider.dir = '/tmp'
     crawler.spider.input_file = 'spider_input'
     StartUrlsLoader.from_crawler(crawler)
 
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
-    mock.assert_called_with('/tmp/spider_input.txt', encoding='utf-8')
-
-
-def test_default_encoding(get_crawler, mocker):
-    mock = mocker.patch('spider_feeder.file_handler.local.open')
-    mock.side_effect = return_string_io('https://url1.com\nhttps://url2.com')
-
-    crawler = get_crawler({'SPIDERFEEDER_INPUT_FILE': 'local.txt'})
-    StartUrlsLoader.from_crawler(crawler)
-
-    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
-
-    mock.assert_called_with('local.txt', encoding='utf-8')
-
-
-def test_file_encoding(get_crawler, mocker):
-    mock = mocker.patch('spider_feeder.file_handler.local.open')
-    mock.side_effect = return_string_io('https://url1.com\nhttps://url2.com')
-
-    crawler = get_crawler({
-        'SPIDERFEEDER_INPUT_FILE': 'local.txt',
-        'SPIDERFEEDER_INPUT_FILE_ENCODING': 'latin-1'
-    })
-    StartUrlsLoader.from_crawler(crawler)
-
-    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
-
-    mock.assert_called_with('local.txt', encoding='latin-1')
-
-
-def test_load_csv_file(get_crawler, mocker):
-    mocker.patch('spider_feeder.file_handler.local.open')
-    mock = mocker.patch('spider_feeder.parser.CsvParser')
-    mock().parse.return_value = ['http://url1.com']
-
-    crawler = get_crawler({
-        'SPIDERFEEDER_INPUT_FILE': 'local.csv',
-        'SPIDERFEEDER_INPUT_FILE_ENCODING': 'latin-1'
-    })
-    StartUrlsLoader.from_crawler(crawler)
-
-    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
-
-    mock.assert_called_with(crawler.settings)
-    assert crawler.spider.start_urls == ['http://url1.com']
-
-
-def test_load_json_file(get_crawler, mocker):
-    mocker.patch('spider_feeder.file_handler.s3.open')
-    mock = mocker.patch('spider_feeder.parser.JsonParser')
-    mock().parse.return_value = ['http://url1.com']
-
-    crawler = get_crawler({
-        'SPIDERFEEDER_INPUT_FILE': 's3://local.json',
-    })
-    StartUrlsLoader.from_crawler(crawler)
-
-    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
-
-    mock.assert_called_with(crawler.settings)
-    assert crawler.spider.start_urls == ['http://url1.com']
-
-
-def test_load_file_custom_parser(get_crawler, mocker):
-    mocker.patch('spider_feeder.file_handler.local.open')
-
-    crawler = get_crawler({
-        'SPIDERFEEDER_INPUT_FILE': 'local.myext',
-        'SPIDERFEEDER_FILE_PARSERS': {
-            'myext': 'tests.test_loaders.CustomParser'
-        }
-    })
-    StartUrlsLoader.from_crawler(crawler)
-
-    crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
-
-    assert crawler.spider.start_urls == ['http://override.com']
+    mock.assert_called_with('/tmp/spider_input.txt', crawler.settings)

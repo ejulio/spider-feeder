@@ -17,6 +17,7 @@ setup(
     tests_require=['scrapy', 'pytest', 'pytest-mock'],
     extras_require={
         's3': ['botocore'],
+        'collections': ['python-scrapinghub'],
         'pep8': ['flake8'],
     },
     classifiers=[

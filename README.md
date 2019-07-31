@@ -68,17 +68,17 @@ This means that the input file format is inferred from the given file extension.
 There are two extensions to load input data to your spiders.
 
 * `spider_feeder.loaders.StartUrlsLoader`: sets a list of urls to `spider.start_urls`
-* `spider_feeder.loaders.StartRequestsLoader`: overrides `spider.start_requests` by making a request to the given URL and setting `meta` to extra metadata parsed from `json`, `csv` or `hubstorage`.
+* `spider_feeder.loaders.StartRequestsLoader`: overrides `spider.start_requests` by making a request to the given URL and setting `meta` to extra metadata parsed from `json`, `csv` or `collections`.
 
 ## Settings
 
 `SPIDERFEEDER_INPUT_URI` is the URI to load URLs from.
-* If _scheme_ (`local`, `s3`, `hubstorage`) is not provided, it'll use `local`
+* If _scheme_ (`local`, `s3`, `collections`) is not provided, it'll use `local`
 * It can be formatted using spider attributes like `%(param)s` (similar to `FEED_URI` in scrapy)
 * Supported schemes are: `''` or `file` for local files and `s3` for AWS S3 (requires `botocore`)
 * When using `s3`, the URI must be formatted as `s3://key_id:secret_key@bucket/blob.txt`
 * If `key_id` and `secret_key` are not provided in the URI, they can be provided by the following settings: `SPIDERFEEDER_AWS_ACCESS_KEY_ID` and `SPIDERFEEDER_AWS_SECRET_ACCESS_KEY`.
-* When using `hubstorage`, it'll load URLs from [Scrapinghub Collections](https://doc.scrapinghub.com/api/collections.html)
+* When using `collections`, it'll load URLs from [Scrapinghub Collections](https://doc.scrapinghub.com/api/collections.html)
 
 `SPIDERFEEDER_INPUT_FILE_ENCODING` sets the file encoding. DEFAULT = `'utf-8'`.
 

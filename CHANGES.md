@@ -18,6 +18,7 @@ Whenever possible, link the given PR with the feature/fix.
 
 * Support for `.csv` and `.json` input files [PR#8](https://github.com/ejulio/spider-feeder/pull/8)
 * Support for Scrapinghub Collections [PR#11](https://github.com/ejulio/spider-feeder/pull/11)
+* Support for loading meta data in requests through `StartRequestsLoader` [PR #12](https://github.com/ejulio/spider-feeder/pull/12)
 
 ### Changed
 

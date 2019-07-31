@@ -21,7 +21,7 @@ class ScrapinghubCollectionStore(BaseStore):
         jobkey = parse_job_key(os.environ['SHUB_JOBKEY'])
         project = client.get_project(jobkey.project_id)
 
-        collection_name = input_uri.replace('hubstorage://', '')
+        collection_name = input_uri.replace('collections://', '')
         self._store = project.collections.get_store(collection_name)
 
     def read_input_items(self):

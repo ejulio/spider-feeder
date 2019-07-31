@@ -8,12 +8,12 @@ spider-feeder is a library to help loading inputs to scrapy spiders.
 
 * `pip install spider-feeder` to load only local files
 * `pip install spider-feeder[s3]` to load files from AWS S3
-* `pip install spider-feeder[hubstorage]` to load from Scrapinghub Collections
+* `pip install spider-feeder[collections]` to load from Scrapinghub Collections
 
 ## Requirements
 
 * If using `s3`, it requires `botocore`
-* If using `hubstorage`, it requires `python-scrapinghub`
+* If using `collections`, it requires `python-scrapinghub`
 * Otherwise, no requirements
 
 ## Usage (plain text)
@@ -108,7 +108,7 @@ def parse(fd, settings):
 ```
 
 `SPIDERFEEDER_STORES` is a set of absctractions to load URLs from.
-Currently, `FileStore` for `file://` and `s3://`, and `ScrapinghubCollectionStore` for `hubstorage://`.
+Currently, `FileStore` for `file://` and `s3://`, and `ScrapinghubCollectionStore` for `collections://`.
 Say you want to load URLs from an API, then you can add your custom `Store` and set it to an scheme.
 ```
 # settings.py

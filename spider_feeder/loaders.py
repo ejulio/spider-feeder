@@ -22,7 +22,7 @@ class StartUrlsLoader:
         '': 'spider_feeder.store.file_store.FileStore',
         'file': 'spider_feeder.store.file_store.FileStore',
         's3': 'spider_feeder.store.file_store.FileStore',
-        'hubstorage': 'spider_feeder.store.scrapinghub_collection.ScrapinghubCollectionStore',
+        'collections': 'spider_feeder.store.scrapinghub_collection.ScrapinghubCollectionStore',
     }
 
     @classmethod

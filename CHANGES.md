@@ -12,7 +12,7 @@ Whenever possible, link the given PR with the feature/fix.
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Work in Progress
+## 0.2.0 (2019-07-31)
 
 ### Added
 

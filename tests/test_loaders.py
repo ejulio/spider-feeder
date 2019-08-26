@@ -94,7 +94,7 @@ def test_uri_format_spider_attributes(get_crawler, mocker):
     mock.assert_called_with('/tmp/spider_input.txt', crawler.settings)
 
 
-def test_load_start_requests(get_crawler, mocker):
+def test_load_start_data(get_crawler, mocker):
     mock = mocker.patch('spider_feeder.store.file_store.FileStore')
     store_data = [
         ('https://url1.com', {'url_id': '1'}),
@@ -104,12 +104,16 @@ def test_load_start_requests(get_crawler, mocker):
     mock().__iter__.return_value = iter(store_data)
 
     crawler = get_crawler({
-        'EXTENSIONS': {'spider_feeder.loaders.StartRequestsLoader': 500},
+        'EXTENSIONS': {'spider_feeder.loaders.StartUrlsAndMetaLoader': 500},
         'SPIDERFEEDER_INPUT_URI': 'input_file.csv',
     })
 
     crawler.signals.send_catch_log(signals.spider_opened, spider=crawler.spider)
 
-    request_data = [(r.url, r.meta) for r in crawler.spider.start_requests()]
-    assert request_data == store_data
+    expetcted_urls = [url for (url, meta) in store_data]
+    assert expetcted_urls == list(crawler.spider.start_urls)
+
+    expetcted_meta = [meta for (url, meta) in store_data]
+    assert expetcted_meta == list(crawler.spider.start_meta)
+
     assert crawler.stats.get_value(f'spider_feeder/{crawler.spider.name}/url_count') == 3

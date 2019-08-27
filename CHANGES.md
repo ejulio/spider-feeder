@@ -12,13 +12,13 @@ Whenever possible, link the given PR with the feature/fix.
 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## 0.2.0 (2019-07-31)
+## 0.2.0 (2019-08-27)
 
 ### Added
 
 * Support for `.csv` and `.json` input files [PR#8](https://github.com/ejulio/spider-feeder/pull/8)
 * Support for Scrapinghub Collections [PR#11](https://github.com/ejulio/spider-feeder/pull/11)
-* Support for loading meta data in requests through `StartRequestsLoader` [PR #12](https://github.com/ejulio/spider-feeder/pull/12)
+* Support for loading urls and meta data through `StartUrlsAndMetaLoader` [PR #12](https://github.com/ejulio/spider-feeder/pull/12) and [PR #14](https://github.com/ejulio/spider-feeder/pull/14)
 
 ### Changed
 

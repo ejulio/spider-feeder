@@ -1,7 +1,8 @@
 from urllib.parse import urlparse
 import logging
+from itertools import tee
 
-from scrapy import Request, signals
+from scrapy import signals
 from scrapy.exceptions import NotConfigured
 from scrapy.utils.misc import load_object
 
@@ -65,41 +66,35 @@ class StartUrlsLoader(BaseLoader):
     '''Loader setting spider.start_urls. For more information, please refer to BaseLoader.'''
 
     def set_spider_input_data(self, spider, store):
-        spider.start_urls = _StartDataIter(
-            self._crawler,
-            spider,
-            store,
-            generator_fn=lambda url, meta: url
-        )
+        store = _Iter(self._crawler, spider, store)
+        spider.start_urls = (url for (url, _) in store)
 
 
-class StartRequestsLoader(BaseLoader):
-    '''Loader setting spider.start_requests. For more information, please refer to BaseLoader.'''
+class StartUrlsAndMetaLoader(BaseLoader):
+    '''Loader setting spider.start_urls and spider.start_meta.
+    For more information, please refer to BaseLoader.'''
 
     def set_spider_input_data(self, spider, store):
-        spider.start_requests = _StartDataIter(
-            self._crawler,
-            spider,
-            store,
-            generator_fn=lambda url, meta: Request(url, meta=meta)
-        )
+        store = _Iter(self._crawler, spider, store)
+        (url_iter, meta_iter) = tee(store)
+        spider.start_urls = (url for (url, _) in url_iter)
+        setattr(spider, 'start_meta', (meta for (_, meta) in meta_iter))
 
 
-class _StartDataIter:
+class _Iter:
 
-    def __init__(self, crawler, spider, store, generator_fn):
+    def __init__(self, crawler, spider, store):
         self._crawler = crawler
         self._spider = spider
         self._store = store
-        self._generator_fn = generator_fn
 
     def __call__(self):
         yield from self
 
     def __iter__(self):
         n_urls = 0
-        for (url, meta) in self._store:
-            yield self._generator_fn(url, meta)
+        for item in self._store:
+            yield item
             n_urls += 1
 
         self._crawler.stats.set_value(f'spider_feeder/{self._spider.name}/url_count', n_urls)

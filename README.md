@@ -53,7 +53,7 @@ id,input_url
 Then, in `settings.py`
 ```
 EXTENSIONS = {
-    'spider_feeder.loaders.StartRequestsLoader': 0
+    'spider_feeder.loaders.StartUrlsAndMetaLoader': 0
 }
 
 SPIDERFEEDER_INPUT_URI = './urls.csv'
@@ -63,12 +63,27 @@ SPIDERFEEDER_INPUT_FIELD = 'input_url'
 The same applies for `json`, just requiring to update the file extension to `.json` instead of `.csv`.
 This means that the input file format is inferred from the given file extension.
 
+If you need the extra fields in the input files, you can write `start_requests` to get them.
+```
+# my_spider.py
+
+class MySpider(scrapy.Spider):
+
+    def start_requests(self):
+        # super().start_requests() makes requests using URLs in self.start_urls
+        # self.start_meta is populated with extra fields from input by StartUrlsAndMetaLoader
+        for (request, meta) in zip(super().start_requests(), self.start_meta):
+            request.meta.update(meta)
+            yield request
+```
+
+
 ## Extensions
 
 There are two extensions to load input data to your spiders.
 
 * `spider_feeder.loaders.StartUrlsLoader`: sets a list of urls to `spider.start_urls`
-* `spider_feeder.loaders.StartRequestsLoader`: overrides `spider.start_requests` by making a request to the given URL and setting `meta` to extra metadata parsed from `json`, `csv` or `collections`.
+* `spider_feeder.loaders.StartUrlsAndMetaLoader`: overrides `spider.start_urls` and a custom attribute `spider.start_meta` with extra metadata parsed from `json`, `csv` or `collections`.
 
 ## Settings
 

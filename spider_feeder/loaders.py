@@ -92,9 +92,6 @@ class _Iter:
         yield from self
 
     def __iter__(self):
-        n_urls = 0
         for item in self._store:
             yield item
-            n_urls += 1
-
-        self._crawler.stats.set_value(f'spider_feeder/{self._spider.name}/url_count', n_urls)
+            self._crawler.stats.inc_value(f'spider_feeder/{self._spider.name}/url_count')

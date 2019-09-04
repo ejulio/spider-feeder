@@ -97,6 +97,11 @@ There are two extensions to load input data to your spiders.
 
 `SPIDERFEEDER_INPUT_FILE_ENCODING` sets the file encoding. DEFAULT = `'utf-8'`.
 
+`SPIDERFEEDER_INPUT_FORMAT` sets the file format (`txt`, `csv`, `json`). DEFAULT = `None`.
+This setting is preferred over the file extension in `SPIDERFEEDER_INPUT_URI`.
+So, if `SPIDERFEEDER_INPUT_FORMAT` is set, this is the one to be used, otherwise
+it will fallback to the file extension in `SPIDERFEEDER_INPUT_URI`.
+
 `SPIDERFEEDER_INPUT_FIELD` sets the url field when parsing `json` or `csv` files.
 
 `SPIDERFEEDER_FILE_HANDLERS` is a set of functions to be matched with the given file scheme.

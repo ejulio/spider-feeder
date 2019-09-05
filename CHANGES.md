@@ -15,7 +15,7 @@ Whenever possible, link the given PR with the feature/fix.
 
 ### Added
 
-* New setting `SPIDERFEEDER_INPUT_FORMAT` to set the file format or fallback to the file extension. [PR#18](https://github.com/ejulio/spider-feeder/pull/18)
+* New setting `SPIDERFEEDER_INPUT_FORMAT` to set the file format or fall back to the file extension. [PR#18](https://github.com/ejulio/spider-feeder/pull/18)
 
 
 ## 0.2.0 (2019-08-27)

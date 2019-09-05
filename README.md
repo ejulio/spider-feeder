@@ -100,7 +100,7 @@ There are two extensions to load input data to your spiders.
 `SPIDERFEEDER_INPUT_FORMAT` sets the file format (`txt`, `csv`, `json`). DEFAULT = `None`.
 This setting is preferred over the file extension in `SPIDERFEEDER_INPUT_URI`.
 So, if `SPIDERFEEDER_INPUT_FORMAT` is set, this is the one to be used, otherwise
-it will fallback to the file extension in `SPIDERFEEDER_INPUT_URI`.
+it will fall back to the file extension in `SPIDERFEEDER_INPUT_URI`.
 
 `SPIDERFEEDER_INPUT_FIELD` sets the url field when parsing `json` or `csv` files.
 

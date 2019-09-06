@@ -39,13 +39,21 @@ class FileStore(BaseStore):
         self._input_file_uri = input_file_uri
         self._settings = settings
         self._file_encoding = settings.get('SPIDERFEEDER_INPUT_FILE_ENCODING', 'utf-8')
-        self._file_format = settings.get('SPIDERFEEDER_INPUT_FORMAT', None)
+        self._input_format = settings.get('SPIDERFEEDER_INPUT_FORMAT', None)
 
         handlers = settings.getdict('SPIDERFEEDER_FILE_HANDLERS', {})
         self._handlers = dict(self.FILE_HANDLERS, **handlers)
 
         parsers = settings.getdict('SPIDERFEEDER_FILE_PARSERS', {})
         self._parsers = dict(self.FILE_PARSERS, **parsers)
+
+    @property
+    def _file_format(self):
+        if self._input_format:
+            return self._input_format
+
+        (_, file_extension) = path.splitext(self._input_file_uri)
+        return file_extension[1:]  # remove the "."
 
     def _open(self):
         parsed = urlparse(self._input_file_uri)
@@ -55,10 +63,6 @@ class FileStore(BaseStore):
 
     def _parse(self, fd):
         file_format = self._file_format
-        if not file_format:
-            (_, file_extension) = path.splitext(self._input_file_uri)
-            file_format = file_extension[1:]
-
         logger.info(f'Parsing file {self._input_file_uri} with format {file_format}.')
         parser = load_object(self._parsers[file_format])
         return parser(fd, self._settings)

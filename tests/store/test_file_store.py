@@ -98,6 +98,54 @@ def test_load_json_file(mocker, uri_scheme, file_opener):
     ]
 
 
+@pytest.mark.parametrize('uri_scheme, file_opener', [
+    ('file://', 'spider_feeder.store.file_handler.local.open'),
+    ('s3://', 'spider_feeder.store.file_handler.s3.open'),
+    ('', 'spider_feeder.store.file_handler.local.open'),
+])
+def test_get_file_format_from_setting(mocker, uri_scheme, file_opener):
+    file_content = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
+    mock = mocker.patch(file_opener, return_value=file_content, autospec=True)
+
+    store = FileStore(f'{uri_scheme}temp', Settings({
+        'SPIDERFEEDER_INPUT_FORMAT': 'txt'
+    }))
+
+    store_meta = []
+    store_urls = []
+    for (url, meta) in store:
+        store_urls.append(url)
+        store_meta.append(meta)
+
+    mock.assert_called_with(f'{uri_scheme}temp', encoding='utf-8')
+    assert store_meta == [{}, {}]
+    assert store_urls == ['http://url1.com', 'http://url2.com']
+
+
+@pytest.mark.parametrize('uri_scheme, file_opener', [
+    ('file://', 'spider_feeder.store.file_handler.local.open'),
+    ('s3://', 'spider_feeder.store.file_handler.s3.open'),
+    ('', 'spider_feeder.store.file_handler.local.open'),
+])
+def test_get_file_format_setting_is_preferred_over_file_extension(mocker, uri_scheme, file_opener):
+    file_content = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
+    mock = mocker.patch(file_opener, return_value=file_content, autospec=True)
+
+    store = FileStore(f'{uri_scheme}temp.csv', Settings({
+        'SPIDERFEEDER_INPUT_FORMAT': 'txt'
+    }))
+
+    store_meta = []
+    store_urls = []
+    for (url, meta) in store:
+        store_urls.append(url)
+        store_meta.append(meta)
+
+    mock.assert_called_with(f'{uri_scheme}temp.csv', encoding='utf-8')
+    assert store_meta == [{}, {}]
+    assert store_urls == ['http://url1.com', 'http://url2.com']
+
+
 def test_fail_if_input_field_and_not_dict_data(mocker):
     mocker.patch(
         'spider_feeder.store.file_handler.local.open',

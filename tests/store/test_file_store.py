@@ -24,7 +24,8 @@ def test_load_txt_file(mocker, uri_scheme, file_opener):
     file_content = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
     mock = mocker.patch(file_opener, return_value=file_content, autospec=True)
 
-    store = FileStore(f'{uri_scheme}temp.txt', Settings())
+    settings = Settings()
+    store = FileStore(f'{uri_scheme}temp.txt', settings)
 
     store_meta = []
     store_urls = []
@@ -32,7 +33,7 @@ def test_load_txt_file(mocker, uri_scheme, file_opener):
         store_urls.append(url)
         store_meta.append(meta)
 
-    mock.assert_called_with(f'{uri_scheme}temp.txt', encoding='utf-8')
+    mock.assert_called_with(f'{uri_scheme}temp.txt', encoding='utf-8', settings=settings)
     assert store_meta == [{}, {}]
     assert store_urls == ['http://url1.com', 'http://url2.com']
 
@@ -50,9 +51,10 @@ def test_load_csv_file(mocker, uri_scheme, file_opener):
     ]))
     mock = mocker.patch(file_opener, return_value=file_content, autospec=True)
 
-    store = FileStore(f'{uri_scheme}temp.csv', Settings({
+    settings = Settings({
         'SPIDERFEEDER_INPUT_FIELD': 'url'
-    }))
+    })
+    store = FileStore(f'{uri_scheme}temp.csv', settings)
 
     store_meta = []
     store_urls = []
@@ -60,7 +62,7 @@ def test_load_csv_file(mocker, uri_scheme, file_opener):
         store_urls.append(url)
         store_meta.append(meta)
 
-    mock.assert_called_with(f'{uri_scheme}temp.csv', encoding='utf-8')
+    mock.assert_called_with(f'{uri_scheme}temp.csv', encoding='utf-8', settings=settings)
     assert store_urls == ['http://url1.com', 'http://url2.com']
     assert store_meta == [
         {'url_id': '1', 'url': 'http://url1.com'},
@@ -80,9 +82,10 @@ def test_load_json_file(mocker, uri_scheme, file_opener):
     ]))
     mock = mocker.patch(file_opener, return_value=file_content, autospec=True)
 
-    store = FileStore(f'{uri_scheme}temp.json', Settings({
+    settings = Settings({
         'SPIDERFEEDER_INPUT_FIELD': 'url'
-    }))
+    })
+    store = FileStore(f'{uri_scheme}temp.json', settings)
 
     store_meta = []
     store_urls = []
@@ -90,7 +93,7 @@ def test_load_json_file(mocker, uri_scheme, file_opener):
         store_urls.append(url)
         store_meta.append(meta)
 
-    mock.assert_called_with(f'{uri_scheme}temp.json', encoding='utf-8')
+    mock.assert_called_with(f'{uri_scheme}temp.json', encoding='utf-8', settings=settings)
     assert store_urls == ['http://url1.com', 'http://url2.com']
     assert store_meta == [
         {'url_id': '1', 'url': 'http://url1.com'},
@@ -107,9 +110,10 @@ def test_get_file_format_from_setting(mocker, uri_scheme, file_opener):
     file_content = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
     mock = mocker.patch(file_opener, return_value=file_content, autospec=True)
 
-    store = FileStore(f'{uri_scheme}temp', Settings({
+    settings = Settings({
         'SPIDERFEEDER_INPUT_FORMAT': 'txt'
-    }))
+    })
+    store = FileStore(f'{uri_scheme}temp', settings)
 
     store_meta = []
     store_urls = []
@@ -117,7 +121,7 @@ def test_get_file_format_from_setting(mocker, uri_scheme, file_opener):
         store_urls.append(url)
         store_meta.append(meta)
 
-    mock.assert_called_with(f'{uri_scheme}temp', encoding='utf-8')
+    mock.assert_called_with(f'{uri_scheme}temp', encoding='utf-8', settings=settings)
     assert store_meta == [{}, {}]
     assert store_urls == ['http://url1.com', 'http://url2.com']
 
@@ -131,9 +135,10 @@ def test_get_file_format_setting_is_preferred_over_file_extension(mocker, uri_sc
     file_content = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
     mock = mocker.patch(file_opener, return_value=file_content, autospec=True)
 
-    store = FileStore(f'{uri_scheme}temp.csv', Settings({
+    settings = Settings({
         'SPIDERFEEDER_INPUT_FORMAT': 'txt'
-    }))
+    })
+    store = FileStore(f'{uri_scheme}temp.csv', settings)
 
     store_meta = []
     store_urls = []
@@ -141,7 +146,7 @@ def test_get_file_format_setting_is_preferred_over_file_extension(mocker, uri_sc
         store_urls.append(url)
         store_meta.append(meta)
 
-    mock.assert_called_with(f'{uri_scheme}temp.csv', encoding='utf-8')
+    mock.assert_called_with(f'{uri_scheme}temp.csv', encoding='utf-8', settings=settings)
     assert store_meta == [{}, {}]
     assert store_urls == ['http://url1.com', 'http://url2.com']
 
@@ -171,30 +176,32 @@ def test_file_encoding(mocker):
         autospec=True
     )
 
-    store = FileStore('temp.txt', Settings({
+    settings = Settings({
         'SPIDERFEEDER_INPUT_FILE_ENCODING': 'latin-1'
-    }))
+    })
+    store = FileStore('temp.txt', settings)
 
     for (url, meta) in store:
         pass
 
-    mock.assert_called_with('temp.txt', encoding='latin-1')
+    mock.assert_called_with('temp.txt', encoding='latin-1', settings=settings)
 
 
 def test_custom_file_handler(mocker):
     mock = mocker.patch('tests.store.test_file_store.custom_open')
     mock.return_value = StringIO('\n'.join(['http://url1.com', 'http://url2.com']))
 
-    store = FileStore('sc://temp.txt', Settings({
+    settings = Settings({
         'SPIDERFEEDER_FILE_HANDLERS': {
             'sc': 'tests.store.test_file_store.custom_open'
         }
-    }))
+    })
+    store = FileStore('sc://temp.txt', settings)
 
     for (url, meta) in store:
         pass
 
-    mock.assert_called_with('sc://temp.txt', encoding='utf-8')
+    mock.assert_called_with('sc://temp.txt', encoding='utf-8', settings=settings)
 
 
 def test_custom_file_parser(mocker):

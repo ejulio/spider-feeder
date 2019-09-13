@@ -5,6 +5,7 @@ import pytest
 import botocore.session
 from botocore.stub import Stubber
 from botocore.response import StreamingBody
+from scrapy.settings import Settings
 
 from spider_feeder.store.file_handler import s3
 
@@ -69,7 +70,7 @@ def test_open_s3_blob(botocore_client, mocker):
         }
         stubber.add_response('get_object', response, expected_params)
 
-        fd = s3.open('s3://bucket/blob.txt', encoding='utf-8')
+        fd = s3.open('s3://bucket/blob.txt', encoding='utf-8', settings=Settings())
 
         assert fd.read() == file_content
         assert isinstance(fd, StringIO)
@@ -85,7 +86,7 @@ def test_open_encoded_s3_blob(botocore_client, mocker):
         }
         stubber.add_response('get_object', response, expected_params)
 
-        fd = s3.open('s3://bucket/blob.txt', encoding='iso-8859-1')
+        fd = s3.open('s3://bucket/blob.txt', encoding='iso-8859-1', settings=Settings())
 
         assert fd.read() == file_content
 
@@ -100,7 +101,7 @@ def test_open_s3_blob_using_uri_credentials(botocore_client, mocker):
         }
         stubber.add_response('get_object', response, expected_params)
 
-        s3.open('s3://key_id:secret@bucket/blob.txt', encoding='utf-8')
+        s3.open('s3://key_id:secret@bucket/blob.txt', encoding='utf-8', settings=Settings())
 
         session_mock.create_client.assert_called_once_with(
             's3',
@@ -111,11 +112,6 @@ def test_open_s3_blob_using_uri_credentials(botocore_client, mocker):
 
 def test_open_s3_blob_using_project_credentials(botocore_client, mocker):
     (stubber, session_mock) = botocore_client(mocker)
-    settings_mock = mocker.patch('spider_feeder.store.file_handler.s3.get_project_settings')
-    settings_mock.return_value = {
-        'SPIDERFEEDER_AWS_ACCESS_KEY_ID': 'key_id',
-        'SPIDERFEEDER_AWS_SECRET_ACCESS_KEY': 'secret'
-    }
     with stubber:
         file_content = 'http://url1.com\nhttps://url1.com'
         response = get_object_response(file_content)
@@ -124,7 +120,14 @@ def test_open_s3_blob_using_project_credentials(botocore_client, mocker):
         }
         stubber.add_response('get_object', response, expected_params)
 
-        s3.open('s3://bucket/blob.txt', encoding='utf-8')
+        s3.open(
+            's3://bucket/blob.txt',
+            encoding='utf-8',
+            settings=Settings({
+                'SPIDERFEEDER_AWS_ACCESS_KEY_ID': 'key_id',
+                'SPIDERFEEDER_AWS_SECRET_ACCESS_KEY': 'secret'
+            })
+        )
 
         session_mock.create_client.assert_called_once_with(
             's3',
@@ -135,11 +138,6 @@ def test_open_s3_blob_using_project_credentials(botocore_client, mocker):
 
 def test_open_s3_blob_using_scrapy_credentials(botocore_client, mocker):
     (stubber, session_mock) = botocore_client(mocker)
-    settings_mock = mocker.patch('spider_feeder.store.file_handler.s3.get_project_settings')
-    settings_mock.return_value = {
-        'AWS_ACCESS_KEY_ID': 'some_key_id',
-        'AWS_SECRET_ACCESS_KEY': 'some_secret'
-    }
     with stubber:
         file_content = 'http://url1.com\nhttps://url1.com'
         response = get_object_response(file_content)
@@ -148,7 +146,14 @@ def test_open_s3_blob_using_scrapy_credentials(botocore_client, mocker):
         }
         stubber.add_response('get_object', response, expected_params)
 
-        s3.open('s3://bucket/blob.txt', encoding='utf-8')
+        s3.open(
+            's3://bucket/blob.txt',
+            encoding='utf-8',
+            settings=Settings({
+                'AWS_ACCESS_KEY_ID': 'some_key_id',
+                'AWS_SECRET_ACCESS_KEY': 'some_secret'
+            })
+        )
 
         session_mock.create_client.assert_called_once_with(
             's3',

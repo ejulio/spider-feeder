@@ -5,16 +5,15 @@ from io import StringIO
 from urllib.parse import urlparse
 import logging
 
-from scrapy.utils.project import get_project_settings
 from botocore.session import get_session
 
 
 logger = logging.getLogger(__name__)
 
 
-def open(blob_uri, encoding):
+def open(blob_uri, encoding, settings):
     parsed = urlparse(blob_uri)
-    settings = get_project_settings()
+
     (aws_access_key_id, aws_secret_access_key) = _get_aws_keys(parsed, settings)
     session = get_session()
     client = session.create_client(

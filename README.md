@@ -108,7 +108,7 @@ it will fall back to the file extension in `SPIDERFEEDER_INPUT_URI`.
 
 `SPIDERFEEDER_FILE_HANDLERS` is a set of functions to be matched with the given file scheme.
 You can set your own and it'll be merged with the default one.
-The interface is just a plain function with two arguments `file_uri` and `encoding`.
+The interface is just a plain function with three arguments `file_uri`, `encoding` and `settings`.
 ```
 # settings.py
 SPIDERFEEDER_FILE_HANDLERS = {
@@ -116,7 +116,7 @@ SPIDERFEEDER_FILE_HANDLERS = {
 }
 
 # myproject.my_custom_s3_reader.py
-def open(file_uri, encoding):
+def open(file_uri, encoding, settings):
     # my code here
     pass
 ```

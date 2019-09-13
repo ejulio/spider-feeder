@@ -48,7 +48,7 @@ def _get_aws_keys(parsed_uri, settings):
 
     if not aws_access_key_id and not aws_secret_access_key:
         logger.warning(
-            'No AWS keys were set in the input URI or project settings.'
+            'No AWS keys were set in the input URI or project settings. '
             'If that was intentional, make sure to have them set as environment variables.'
         )
 

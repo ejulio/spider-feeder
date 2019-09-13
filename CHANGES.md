@@ -16,7 +16,7 @@ Whenever possible, link the given PR with the feature/fix.
 ### Added
 
 * New setting `SPIDERFEEDER_INPUT_FORMAT` to set the file format or fall back to the file extension. [PR#18](https://github.com/ejulio/spider-feeder/pull/18)
-
+* Fixed AWS settings set in Dash (Scrapy Cloud) UI. [PR#21](https://github.com/ejulio/spider-feeder/pull/21)
 
 ## 0.2.0 (2019-08-27)
 

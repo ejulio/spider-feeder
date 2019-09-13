@@ -59,7 +59,11 @@ class FileStore(BaseStore):
         parsed = urlparse(self._input_file_uri)
         logger.info(f'Opening file {self._input_file_uri} with scheme {parsed.scheme}.')
         open = load_object(self._handlers[parsed.scheme])
-        return open(self._input_file_uri, encoding=self._input_file_encoding)
+        return open(
+            self._input_file_uri,
+            encoding=self._input_file_encoding,
+            settings=self._settings
+        )
 
     def _parse(self, fd):
         file_format = self._file_format

@@ -4,13 +4,11 @@ This module handles `open()` for files stored in AWS S3.
 from io import StringIO
 from urllib.parse import urlparse
 
-from scrapy.utils.project import get_project_settings
 from botocore.session import get_session
 
 
-def open(blob_uri, encoding):
+def open(blob_uri, encoding, settings):
     parsed = urlparse(blob_uri)
-    settings = get_project_settings()
 
     session = get_session()
     client = session.create_client(

@@ -88,14 +88,17 @@ There are two extensions to load input data to your spiders.
 ## Settings
 
 `SPIDERFEEDER_INPUT_URI` is the URI to load URLs from.
-* If _scheme_ (`local`, `s3`, `collections`) is not provided, it'll use `local`
+* If _scheme_ (`file`, `s3`, `collections`) is not provided, it'll default to `file`
 * It can be formatted using spider attributes like `%(param)s` (similar to `FEED_URI` in scrapy)
-* Supported schemes are: `''` or `file` for local files and `s3` for AWS S3 (requires `botocore`)
-* When using `s3`, the URI must be formatted as `s3://key_id:secret_key@bucket/blob.txt`
-* If `key_id` and `secret_key` are not provided in the URI, they can be provided by the following settings: `SPIDERFEEDER_AWS_ACCESS_KEY_ID` and `SPIDERFEEDER_AWS_SECRET_ACCESS_KEY`.
-    * If they are not provided by these settings, they will fall back to `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
-    * If not set, they can be set as environment variables from `botocore`, but a warning will be logged by `spider-feeder`.
-* When using `collections`, it'll load URLs from [Scrapinghub Collections](https://doc.scrapinghub.com/api/collections.html)
+* Supported schemes are:
+    * `''` or `file` for local files
+    * `s3` for AWS S3 (requires `botocore`)
+        * The URI can be formatted as `s3://key_id:secret_key@bucket/blob.txt`
+        * If `key_id` and `secret_key` are not provided in the URI, they can be provided by the following settings: `SPIDERFEEDER_AWS_ACCESS_KEY_ID` and `SPIDERFEEDER_AWS_SECRET_ACCESS_KEY`.
+        * If they are not provided by these settings, they will fall back to `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
+        * If not set, they can be set as environment variables from `botocore`, but a warning will be logged by `spider-feeder`.
+    * `collections` for [Scrapinghub Collections](https://doc.scrapinghub.com/api/collections.html)
+    * `http` or `https` to load from any URI
 
 `SPIDERFEEDER_INPUT_FILE_ENCODING` sets the file encoding. DEFAULT = `'utf-8'`.
 

@@ -26,6 +26,8 @@ class FileStore(BaseStore):
         '': 'spider_feeder.store.file_handler.local.open',
         'file': 'spider_feeder.store.file_handler.local.open',
         's3': 'spider_feeder.store.file_handler.s3.open',
+        'http': 'spider_feeder.store.file_handler.http.open',
+        'https': 'spider_feeder.store.file_handler.http.open',
     }
 
     FILE_PARSERS = {

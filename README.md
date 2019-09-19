@@ -126,7 +126,9 @@ def open(file_uri, encoding, settings):
 
 `SPIDERFEEDER_FILE_PARSERS` is a set of parsers to be matched with the given file extension.
 You can set your own and it'll be merged with the default one.
-The interface is class with `__init__(settings: scrapy.Settings)` and `parse(fd: file object) -> List[str]` method.
+The interface is a `class` with `__init__(settings: scrapy.Settings)` and `parse(fd: file object) -> Union[List[str], List[dict]]` method.
+Return `List[str]` if there is no extra `meta` to be returned.
+Return `List[dict]` with a key `SPIDERFEEDER_INPUT_FIELD` and some extra `meta`.
 ```
 # settings.py
 SPIDERFEEDER_FILE_PARSERS = {
@@ -140,7 +142,7 @@ def parse(fd, settings):
 ```
 
 `SPIDERFEEDER_STORES` is a set of absctractions to load URLs from.
-Currently, `FileStore` for `file://` and `s3://`, and `ScrapinghubCollectionStore` for `collections://`.
+Currently, `FileStore` for `file://`, `s3://`, `http://`, `https://`, and `ScrapinghubCollectionStore` for `collections://`.
 Say you want to load URLs from an API, then you can add your custom `Store` and set it to an scheme.
 ```
 # settings.py
@@ -157,7 +159,7 @@ class HttpStore:
     def __iter__(self):
         for url in self._api_request():
             yield (url, {})
-            # the second parameter is the extra data/fields from the API 
+            # the second tuple element is the extra data/fields from the API 
 
     def _api_request(self):
         # load URLs from the API and return them

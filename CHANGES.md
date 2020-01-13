@@ -13,6 +13,8 @@ Whenever possible, link the given PR with the feature/fix.
 
 ## Development
 
+## 0.3.0 (2020-01-13)
+
 ### Added
 
 * New setting `SPIDERFEEDER_INPUT_FORMAT` to set the file format or fall back to the file extension. [PR#18](https://github.com/ejulio/spider-feeder/pull/18)

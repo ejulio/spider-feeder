@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='spider-feeder',
-    version='0.2.0',
+    version='0.3.0',
     url='https://github.com/ejulio/spider-feeder',
     author='Júlio César Batista',
     author_email='julio.batista@outlook.com',
